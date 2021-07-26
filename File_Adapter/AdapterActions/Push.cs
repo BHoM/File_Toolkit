@@ -94,7 +94,7 @@ namespace BH.Adapter.File
 
             List<IResource> createdFiles = new List<IResource>();
 
-            List<IResource> filesOrDirs = objects.OfType<IResource>().Select(fd => fd.GetShallowClone() as IResource).ToList();
+            List<IResource> filesOrDirs = objects.OfType<IResource>().Select(fd => fd.ShallowClone() as IResource).ToList();
             List<object> remainder = objects.Where(o => !(o is IResource)).ToList();
 
             if (remainder.Any())
