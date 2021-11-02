@@ -43,7 +43,7 @@ namespace BH.Adapter.File
         public FileAdapter()
         {
             // By default, if they exist already, the files to be created are wiped out and then re-created.
-            this.m_AdapterSettings.DefaultPushType = oM.Adapter.PushType.UpdateOrCreateOnly;
+            this.m_AdapterSettings.DefaultPushType = oM.Adapter.PushType.DeleteThenCreate;
         }
 
         [Description("Initialises the File_Adapter with a target location.")]
