@@ -46,16 +46,20 @@ namespace BH.Adapter.File
             this.m_AdapterSettings.DefaultPushType = oM.Adapter.PushType.DeleteThenCreate;
         }
 
-        [Description("Initialises the File_Adapter with a target location.")]
-        [Input("defaultFilepath", "Default filePath, including file extension. " +
-            "\nWhen Pushing, this is used for pushing objects that are not BHoM `File` or `Directory`." +
-            "\nWhen Pulling, if no request is specified, a FileContentRequest is automatically generated with this location." +
-            "\nBy default this is `C:\\temp\\Filing_Adapter-objects.json`.")]
+        [Description("Initialises the File_Adapter with a target location." +
+            "\nWhen Pushing, this is used for pushing objects that are not BHoM `File` or `Directory`, like generic objects." +
+            "\nWhen Pulling, if no request is specified, a FileContentRequest is automatically generated with this location.")]
+        [Input("targetLocation", "FilePath, including file extension.")]
         public FileAdapter(string targetLocation)
         {
             Init(targetLocation);
         }
 
+        [Description("Initialises the File_Adapter with a target location." +
+           "\nWhen Pushing, this is used for pushing objects that are not BHoM `File` or `Directory`, like generic objects." +
+           "\nWhen Pulling, if no request is specified, a FileContentRequest is automatically generated with this location.")]
+        [Input("folder", "Folder path.")]
+        [Input("fileName", "File name, including file extension.")]
         public FileAdapter(string folder, string fileName)
         {
             if (folder?.Count() > 2 && folder?.ElementAt(1) != ':')
