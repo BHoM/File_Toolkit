@@ -30,7 +30,7 @@ using System.Threading.Tasks;
 using System.IO;
 using BH.oM.Adapters.File;
 using System.ComponentModel;
-using BH.oM.Reflection.Attributes;
+using BH.oM.Base.Attributes;
 
 namespace BH.Engine.Adapters.File
 {
@@ -48,7 +48,7 @@ namespace BH.Engine.Adapters.File
         {
             if (Path.HasExtension(dirFullPath))
             {
-                BH.Engine.Reflection.Compute.RecordError($"{nameof(dirFullPath)} must identify a Directory. Do not include an extension.");
+                BH.Engine.Base.Compute.RecordError($"{nameof(dirFullPath)} must identify a Directory. Do not include an extension.");
                 return null;
             }
 
@@ -64,7 +64,7 @@ namespace BH.Engine.Adapters.File
         {
             if (Path.HasExtension(directoryName))
             {
-                BH.Engine.Reflection.Compute.RecordError($"{nameof(directoryName)} must identify a Directory. Do not include an extension.");
+                BH.Engine.Base.Compute.RecordError($"{nameof(directoryName)} must identify a Directory. Do not include an extension.");
                 return null;
             }
 

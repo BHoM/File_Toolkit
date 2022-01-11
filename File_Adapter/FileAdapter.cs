@@ -24,7 +24,7 @@ using BH.Adapter;
 using BH.Engine.Reflection;
 using BH.oM.Base;
 using BH.oM.Data.Requests;
-using BH.oM.Reflection.Attributes;
+using BH.oM.Base.Attributes;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -90,7 +90,7 @@ namespace BH.Adapter.File
         {
             if (string.IsNullOrWhiteSpace(location))
             {
-                BH.Engine.Reflection.Compute.RecordError("Please specifiy a valid target location.");
+                BH.Engine.Base.Compute.RecordError("Please specifiy a valid target location.");
                 return true;
             }
 
@@ -99,7 +99,7 @@ namespace BH.Adapter.File
             if (!ProcessExtension(ref m_defaultFilePath))
                 return false;
 
-            BH.Engine.Reflection.Compute.RecordNote($"The adapter will always target the input location `{location}`." +
+            BH.Engine.Base.Compute.RecordNote($"The adapter will always target the input location `{location}`." +
                 $"\nTo target multiple Files, use the {this.GetType().Name} constructor with no input.");
 
             // By default, the objects are appendend to the file if it exists already.
@@ -117,14 +117,14 @@ namespace BH.Adapter.File
 
             if (!Path.HasExtension(m_defaultFilePath))
             {
-                Engine.Reflection.Compute.RecordNote($"No extension specified in the FileName input. Defaulting to .json.");
+                Engine.Base.Compute.RecordNote($"No extension specified in the FileName input. Defaulting to .json.");
                 ext = ".json";
                 filePath += ext;
             }
 
             if (ext != ".json")
             {
-                Engine.Reflection.Compute.RecordError($"File_Adapter currently supports only .json extension type.\nSpecified file extension is `{ext}`.");
+                Engine.Base.Compute.RecordError($"File_Adapter currently supports only .json extension type.\nSpecified file extension is `{ext}`.");
                 return false;
             }
 

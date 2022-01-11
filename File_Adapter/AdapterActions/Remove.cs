@@ -48,7 +48,7 @@ namespace BH.Adapter.File
             RemoveRequest removeRequest = request as RemoveRequest;
             if (removeRequest == null)
             {
-                BH.Engine.Reflection.Compute.RecordWarning($"Please specify a valid {nameof(RemoveRequest)}.");
+                BH.Engine.Base.Compute.RecordWarning($"Please specify a valid {nameof(RemoveRequest)}.");
                 return 0;
             }
 
@@ -56,7 +56,7 @@ namespace BH.Adapter.File
 
             if (m_Remove_enableDeleteWarning && !removeConfig.DisableWarnings)
             {
-                BH.Engine.Reflection.Compute.RecordWarning($"This Action can delete files and folders with their contents." +
+                BH.Engine.Base.Compute.RecordWarning($"This Action can delete files and folders with their contents." +
                     $"\nMake sure that you know what you are doing. Re-enable the component to continue.");
 
                 m_Remove_enableDeleteWarning = false;
@@ -66,7 +66,7 @@ namespace BH.Adapter.File
 
             if (m_Remove_enableDeleteAlert && (removeConfig.IncludeHiddenFiles))
             {
-                BH.Engine.Reflection.Compute.RecordError($"Your {nameof(removeConfig)} is set to {nameof(removeConfig.IncludeHiddenFiles)}" +
+                BH.Engine.Base.Compute.RecordError($"Your {nameof(removeConfig)} is set to {nameof(removeConfig.IncludeHiddenFiles)}" +
                     $"\nMake sure you know what you are doing. To continue, re-enable the component.");
 
                 m_Remove_enableDeleteAlert = false;

@@ -21,7 +21,7 @@
  */
 
 using BH.oM.Adapters.File;
-using BH.oM.Reflection.Attributes;
+using BH.oM.Base.Attributes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -62,7 +62,7 @@ namespace BH.Engine.Adapters.File
             }
             catch { }
 
-            BH.Engine.Reflection.Compute.RecordError($"The resource {iLocRes.IFullPath()} has an invalid path.");
+            BH.Engine.Base.Compute.RecordError($"The resource {iLocRes.IFullPath()} has an invalid path.");
 
             return null;
         }

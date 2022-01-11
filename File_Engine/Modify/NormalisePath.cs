@@ -21,7 +21,7 @@
  */
 
 using BH.oM.Adapters.File;
-using BH.oM.Reflection.Attributes;
+using BH.oM.Base.Attributes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -49,7 +49,7 @@ namespace BH.Engine.Adapters.File
                                .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
             } catch
             {
-                BH.Engine.Reflection.Compute.RecordWarning("It was not possible to normalise the path.");
+                BH.Engine.Base.Compute.RecordWarning("It was not possible to normalise the path.");
             }
 
             return normalisedPath;

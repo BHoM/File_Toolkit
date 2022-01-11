@@ -54,7 +54,7 @@ namespace BH.Adapter.File
 
             if (pushType == PushType.FullPush)
             {
-                BH.Engine.Reflection.Compute.RecordError($"The specified {nameof(PushType)} {nameof(PushType.FullPush)} is not supported.");
+                BH.Engine.Base.Compute.RecordError($"The specified {nameof(PushType)} {nameof(PushType.FullPush)} is not supported.");
                 return false;
             }
 
@@ -68,7 +68,7 @@ namespace BH.Adapter.File
 
             if (pushCfg.BeautifyJson && pushCfg.UseDatasetSerialization)
             {
-                BH.Engine.Reflection.Compute.RecordError($"Input `{nameof(PushConfig.BeautifyJson)}` and `{nameof(PushConfig.UseDatasetSerialization)}` cannot be both set to True.");
+                BH.Engine.Base.Compute.RecordError($"Input `{nameof(PushConfig.BeautifyJson)}` and `{nameof(PushConfig.UseDatasetSerialization)}` cannot be both set to True.");
                 return false;
             }
 
@@ -82,7 +82,7 @@ namespace BH.Adapter.File
             if (string.IsNullOrWhiteSpace(m_defaultFilePath)) // = if we are about to push multiple files/directories
                 if (pushType == PushType.DeleteThenCreate && m_Push_enableDeleteWarning && !pushConfig.DisableWarnings ) 
                 {
-                    BH.Engine.Reflection.Compute.RecordWarning($"You have selected the {nameof(PushType)} {nameof(PushType.DeleteThenCreate)}." +
+                    BH.Engine.Base.Compute.RecordWarning($"You have selected the {nameof(PushType)} {nameof(PushType.DeleteThenCreate)}." +
                         $"\nThis has the potential of deleting files and folders with their contents." +
                         $"\nMake sure that you know what you are doing. This warning will not be repeated." +
                         $"\nRe-enable the component to continue.");
@@ -101,7 +101,7 @@ namespace BH.Adapter.File
             {
                 if (filesOrDirs.Any())
                 {
-                    BH.Engine.Reflection.Compute.RecordError($"Input objects are both of type `{nameof(BH.oM.Adapters.File.File)}`/`{nameof(BH.oM.Adapters.File.Directory)}` and generic objects." +
+                    BH.Engine.Base.Compute.RecordError($"Input objects are both of type `{nameof(BH.oM.Adapters.File.File)}`/`{nameof(BH.oM.Adapters.File.Directory)}` and generic objects." +
                       $"\nIn order to push them:" +
                       $"\n\t- for the `{nameof(BH.oM.Adapters.File.File)}`/`{nameof(BH.oM.Adapters.File.Directory)}` objects, use a Push using a {nameof(FileAdapter)} with no targetLocation input;"+
                       $"\n\t- for the generic objects, use a Push using a {nameof(FileAdapter)} that specifies a targetLocation.");
@@ -109,7 +109,7 @@ namespace BH.Adapter.File
                 }
                 else if (string.IsNullOrWhiteSpace(m_defaultFilePath))
                 {
-                    BH.Engine.Reflection.Compute.RecordError($"To Push objects that are not of type `{nameof(BH.oM.Adapters.File.File)}` or `{nameof(BH.oM.Adapters.File.Directory)}`," +
+                    BH.Engine.Base.Compute.RecordError($"To Push objects that are not of type `{nameof(BH.oM.Adapters.File.File)}` or `{nameof(BH.oM.Adapters.File.Directory)}`," +
                         $"\nyou need to specify a target Location by creating the {nameof(FileAdapter)} through the constructor with inputs.");
                     return null;
                 }
@@ -118,7 +118,7 @@ namespace BH.Adapter.File
             if (m_defaultFilePath != null)
             {
                 if (filesOrDirs.Any())
-                    BH.Engine.Reflection.Compute.RecordWarning($"A `targetLocation` has been specified in the File_Adapter constructor." +
+                    BH.Engine.Base.Compute.RecordWarning($"A `targetLocation` has been specified in the File_Adapter constructor." +
                         $"\nObjects of type `{nameof(BH.oM.Adapters.File.File)}` or `{nameof(BH.oM.Adapters.File.Directory)}` will be appended to the file at `targetLocation`." +
                         $"\nIf you want to target multiple files, you need create the {nameof(FileAdapter)} through the constructor without inputs.");
             }
@@ -134,14 +134,14 @@ namespace BH.Adapter.File
 
                     if (string.IsNullOrWhiteSpace(extension))
                     {
-                        BH.Engine.Reflection.Compute.RecordNote($"File {fileOrDir.IFullPath()} has no extension specified. Defaults to JSON.");
+                        BH.Engine.Base.Compute.RecordNote($"File {fileOrDir.IFullPath()} has no extension specified. Defaults to JSON.");
                         extension = ".json";
                         fileOrDir.Name += extension;
                     }
 
                     if (extension != ".json")
                     {
-                        BH.Engine.Reflection.Compute.RecordWarning($"Cannot create File {fileOrDir.IFullPath()}. Currently only JSON extension is supported.");
+                        BH.Engine.Base.Compute.RecordWarning($"Cannot create File {fileOrDir.IFullPath()}. Currently only JSON extension is supported.");
                         continue;
                     }
                 }

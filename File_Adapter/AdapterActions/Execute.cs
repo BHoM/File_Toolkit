@@ -34,8 +34,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BH.Engine.Base;
-using BH.oM.Reflection;
-using BH.oM.Reflection.Attributes;
+using BH.oM.Base;
+using BH.oM.Base.Attributes;
 
 namespace BH.Adapter.File
 {
@@ -47,7 +47,7 @@ namespace BH.Adapter.File
 
         [MultiOutput(0, "success", "List of booleans indicating whether the command succeeded for the individual items.")]
         [MultiOutput(1, "GlobalSuccess", "Bool indicating whether the command succeded for all the provided inputs.")]
-        public override oM.Reflection.Output<List<object>, bool> Execute(IExecuteCommand command, ActionConfig actionConfig = null)
+        public override Output<List<object>, bool> Execute(IExecuteCommand command, ActionConfig actionConfig = null)
         {
             if (command == null)
                 return new Output<List<object>, bool>();
@@ -56,7 +56,7 @@ namespace BH.Adapter.File
 
             if (m_Execute_enableWarning && !executeConfig.DisableWarnings)
             {
-                BH.Engine.Reflection.Compute.RecordWarning($"This Action can move, rename and copy files and folders with their contents." +
+                BH.Engine.Base.Compute.RecordWarning($"This Action can move, rename and copy files and folders with their contents." +
                     $"\nMake sure that you know what you are doing. This warning will not be repeated." +
                     $"\nRe-enable the component to continue.");
 
@@ -72,7 +72,7 @@ namespace BH.Adapter.File
 
         /***************************************************/
 
-        private oM.Reflection.Output<List<object>, bool> RunCommand(IMRCCommand command)
+        private Output<List<object>, bool> RunCommand(IMRCCommand command)
         {
             string source = command.FullPath?.NormalisePath(false);
             string target = command.TargetFullPath?.NormalisePath(false);
@@ -80,7 +80,7 @@ namespace BH.Adapter.File
 
             if (string.IsNullOrWhiteSpace(source) || string.IsNullOrWhiteSpace(target))
             {
-                BH.Engine.Reflection.Compute.RecordWarning("Please specify a valid oM.Adapters.Filing.Command.");
+                BH.Engine.Base.Compute.RecordWarning("Please specify a valid oM.Adapters.Filing.Command.");
                 return null;
             }
             RenameCommand renameCommand = command as RenameCommand;
@@ -107,7 +107,7 @@ namespace BH.Adapter.File
 
             if (renameOnlyWithinFolder && parent1 != parent2)
             {
-                BH.Engine.Reflection.Compute.RecordWarning($"Cannot rename `{source}`" +
+                BH.Engine.Base.Compute.RecordWarning($"Cannot rename `{source}`" +
                     $"because the target parent folder is different from the original.");
 
                 output.Item2 = false;
@@ -129,7 +129,7 @@ namespace BH.Adapter.File
             }
             catch (Exception e)
             {
-                BH.Engine.Reflection.Compute.RecordWarning(e.Message);
+                BH.Engine.Base.Compute.RecordWarning(e.Message);
                 return output;
             }
 
@@ -139,7 +139,7 @@ namespace BH.Adapter.File
             return output;
         }
 
-        private oM.Reflection.Output<List<object>, bool> Copy(string source, string target, bool overwrite = false, bool createDir = true)
+        private Output<List<object>, bool> Copy(string source, string target, bool overwrite = false, bool createDir = true)
         {
             var output = new Output<List<object>, bool>() { Item1 = new List<object>(), Item2 = false };
 
@@ -152,7 +152,7 @@ namespace BH.Adapter.File
             }
             catch (Exception e)
             {
-                BH.Engine.Reflection.Compute.RecordWarning(e.Message);
+                BH.Engine.Base.Compute.RecordWarning(e.Message);
                 return output;
             }
 

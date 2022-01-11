@@ -85,7 +85,7 @@ namespace BH.Adapter.File
                     }
                     catch (Exception e)
                     {
-                        BH.Engine.Reflection.Compute.RecordWarning($"Beautify json failed. File will be created with non-beautified json. Error:\n{e.Message}");
+                        BH.Engine.Base.Compute.RecordWarning($"Beautify json failed. File will be created with non-beautified json. Error:\n{e.Message}");
                     }
                 }
             }
@@ -109,7 +109,7 @@ namespace BH.Adapter.File
                         if (fileExisted)
                             WriteJsonFile(fullPath, json, true);
                         else
-                            BH.Engine.Reflection.Compute.RecordNote($"File {fullPath} was not updated as no file existed at that location.");
+                            BH.Engine.Base.Compute.RecordNote($"File {fullPath} was not updated as no file existed at that location.");
                     }
                     else if (pushType == PushType.UpdateOrCreateOnly)
                     {
@@ -122,11 +122,11 @@ namespace BH.Adapter.File
                         if (!fileExisted)
                             WriteJsonFile(fullPath, json, true);
                         else
-                            BH.Engine.Reflection.Compute.RecordNote($"File {fullPath} was not created as it existed already (Pushtype {pushType.ToString()} was specified).");
+                            BH.Engine.Base.Compute.RecordNote($"File {fullPath} was not created as it existed already (Pushtype {pushType.ToString()} was specified).");
                     }
                     else
                     {
-                        BH.Engine.Reflection.Compute.RecordWarning($"The specified Pushtype of {pushType.ToString()} is not supported for .json files.");
+                        BH.Engine.Base.Compute.RecordWarning($"The specified Pushtype of {pushType.ToString()} is not supported for .json files.");
                         filecreated = false;
                     }
                 }
@@ -134,7 +134,7 @@ namespace BH.Adapter.File
                 {
                     if (pushType == PushType.DeleteThenCreate)
                     {
-                        BH.Engine.Reflection.Compute.RecordNote($"Replacing entire content of file `{fullPath}`.");
+                        BH.Engine.Base.Compute.RecordNote($"Replacing entire content of file `{fullPath}`.");
 
                         // Replace all content.
                         WriteJsonFile(fullPath, json, true);
@@ -143,7 +143,7 @@ namespace BH.Adapter.File
                     {
                         // Should be refactored to cover distinct use cases for CreateNonExisting, UpdateOnly, UpdateOrCreateOnly
                         if (fileExisted)
-                            BH.Engine.Reflection.Compute.RecordNote($"Appending content to file `{fullPath}`.");
+                            BH.Engine.Base.Compute.RecordNote($"Appending content to file `{fullPath}`.");
 
                         WriteJsonFile(fullPath, json, false);
                     }
@@ -177,14 +177,14 @@ namespace BH.Adapter.File
                     }
                     else
                     {
-                        BH.Engine.Reflection.Compute.RecordWarning($"The specified Pushtype of {pushType.ToString()} is not supported for .json files.");
+                        BH.Engine.Base.Compute.RecordWarning($"The specified Pushtype of {pushType.ToString()} is not supported for .json files.");
                         filecreated = false;
                     }
                 }
             }
             catch (Exception e)
             {
-                BH.Engine.Reflection.Compute.RecordError(e.Message);
+                BH.Engine.Base.Compute.RecordError(e.Message);
             }
 
             if (filecreated)
@@ -196,7 +196,7 @@ namespace BH.Adapter.File
                 return createdFile;
             }
 
-            BH.Engine.Reflection.Compute.RecordError($"Could not create {file.ToString()}");
+            BH.Engine.Base.Compute.RecordError($"Could not create {file.ToString()}");
             return null;
         }
 
@@ -240,7 +240,7 @@ namespace BH.Adapter.File
                     string existingJson = System.IO.File.ReadAllText(fullPath);
                     if (existingJson.First() != '[' || existingJson.Last() != ']')
                     {
-                        BH.Engine.Reflection.Compute.RecordError("Invalid operation: attempted to append content to an existing JSON that was not a valid JSON array.");
+                        BH.Engine.Base.Compute.RecordError("Invalid operation: attempted to append content to an existing JSON that was not a valid JSON array.");
                         return;
                     }
 
@@ -268,7 +268,7 @@ namespace BH.Adapter.File
                     string existingJson = System.IO.File.ReadAllText(fullPath);
                     if (existingJson.First() != '{' || existingJson.Last() != '}')
                     {
-                        BH.Engine.Reflection.Compute.RecordError("Invalid operation: attempted to append 'BHoM-Dataset' text to an existing .json file that was not a 'BHoM-Dataset' file.");
+                        BH.Engine.Base.Compute.RecordError("Invalid operation: attempted to append 'BHoM-Dataset' text to an existing .json file that was not a 'BHoM-Dataset' file.");
                         return;
                     }
 
