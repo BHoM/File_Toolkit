@@ -30,7 +30,7 @@ using System.Threading.Tasks;
 using System.IO;
 using BH.oM.Adapters.File;
 using System.ComponentModel;
-using BH.oM.Reflection.Attributes;
+using BH.oM.Base.Attributes;
 
 namespace BH.Adapter.File
 {
@@ -48,7 +48,7 @@ namespace BH.Adapter.File
         {
             if (!Path.HasExtension(fullFileName))
             {
-                BH.Engine.Reflection.Compute.RecordError($"Please include the extension in the {nameof(fullFileName)}.");
+                BH.Engine.Base.Compute.RecordError($"Please include the extension in the {nameof(fullFileName)}.");
                 return null;
             }
 

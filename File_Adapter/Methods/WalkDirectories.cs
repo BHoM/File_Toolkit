@@ -46,7 +46,7 @@ namespace BH.Adapter.File
             // Look in directory and, if requested, recursively in subdirectories.
             if (string.IsNullOrWhiteSpace(fdr.Location))
             {
-                BH.Engine.Reflection.Compute.RecordError($"Missing parameter {nameof(fdr.Location)} from the request.");
+                BH.Engine.Base.Compute.RecordError($"Missing parameter {nameof(fdr.Location)} from the request.");
                 return;
             }
 
@@ -121,7 +121,7 @@ namespace BH.Adapter.File
                 catch (UnauthorizedAccessException e)
                 {
                     // Write out the message and continue.
-                    BH.Engine.Reflection.Compute.RecordNote(e.Message);
+                    BH.Engine.Base.Compute.RecordNote(e.Message);
                 }
 
                 foreach (var fi in fileInfos)

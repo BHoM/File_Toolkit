@@ -69,7 +69,7 @@ namespace BH.Adapter.File
                             System.IO.Directory.CreateDirectory(dirFullPath);
                         else
                         {
-                            BH.Engine.Reflection.Compute.RecordNote($"Directory {dirFullPath} was not created as it existed already (Pushtype {pushType.ToString()} was specified).");
+                            BH.Engine.Base.Compute.RecordNote($"Directory {dirFullPath} was not created as it existed already (Pushtype {pushType.ToString()} was specified).");
                             directoryCreated = false;
                         }
                     }
@@ -79,7 +79,7 @@ namespace BH.Adapter.File
                         {
                             ILocatableResource item = (dir.Content[i] as ILocatableResource).DeepClone();
                             if (item == null)
-                                BH.Engine.Reflection.Compute.RecordWarning($"Cannot push Directory content {dir.Content[i].GetType().Name}.");
+                                BH.Engine.Base.Compute.RecordWarning($"Cannot push Directory content {dir.Content[i].GetType().Name}.");
 
                             string itemFullPath = item.IFullPath();
                             if (string.IsNullOrWhiteSpace(itemFullPath) && !string.IsNullOrWhiteSpace(item.Name))
@@ -92,19 +92,19 @@ namespace BH.Adapter.File
                                 Create(item, pushType, pushConfig);
                             else
                             {
-                                BH.Engine.Reflection.Compute.RecordWarning($"The content of the Directory {dirFullPath} can't be Pushed because the content Path {itemFullPath} does not match the container Directory path.");
+                                BH.Engine.Base.Compute.RecordWarning($"The content of the Directory {dirFullPath} can't be Pushed because the content Path {itemFullPath} does not match the container Directory path.");
                             }
                         }
                 }
                 else
                 {
-                    BH.Engine.Reflection.Compute.RecordWarning($"The specified Pushtype of {pushType.ToString()} is not supported for {nameof(BH.oM.Adapters.File.FSDirectory)} objects.");
+                    BH.Engine.Base.Compute.RecordWarning($"The specified Pushtype of {pushType.ToString()} is not supported for {nameof(BH.oM.Adapters.File.FSDirectory)} objects.");
                     directoryCreated = false;
                 }
             }
             catch (Exception e)
             {
-                BH.Engine.Reflection.Compute.RecordError(e.Message);
+                BH.Engine.Base.Compute.RecordError(e.Message);
             }
 
             if (directoryCreated || existed)
@@ -115,7 +115,7 @@ namespace BH.Adapter.File
                 return createdDir;
             }
 
-            BH.Engine.Reflection.Compute.RecordError($"Could not create the Directory {dir.ToString()}.");
+            BH.Engine.Base.Compute.RecordError($"Could not create the Directory {dir.ToString()}.");
             return null;
         }
     }

@@ -21,7 +21,7 @@
  */
 
 using BH.oM.Adapters.File;
-using BH.oM.Reflection.Attributes;
+using BH.oM.Base.Attributes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -51,7 +51,7 @@ namespace BH.Engine.Adapters.File
                 sysEncoding = file.Encoding();
                 if (sysEncoding == null)
                 {
-                    Reflection.Compute.RecordNote($"Could not determine encoding for file {file.Name}, assuming UTF-8.");
+                    Base.Compute.RecordNote($"Could not determine encoding for file {file.Name}, assuming UTF-8.");
                     sysEncoding = System.Text.Encoding.UTF8;
                 }
             }
@@ -80,7 +80,7 @@ namespace BH.Engine.Adapters.File
             }
             catch
             {
-                Engine.Reflection.Compute.RecordError("Unable to read file: " + bhomFile.IFullPath());
+                Engine.Base.Compute.RecordError("Unable to read file: " + bhomFile.IFullPath());
             }
 
             return contents;

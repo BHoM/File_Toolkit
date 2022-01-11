@@ -22,7 +22,7 @@
 
 using BH.oM.Base;
 using BH.oM.Adapters.File;
-using BH.oM.Reflection.Attributes;
+using BH.oM.Base.Attributes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -52,7 +52,7 @@ namespace BH.Engine.Adapters.File
                 return baseInfo.Name;
 
             if (!IsAcyclic(baseInfo))
-                BH.Engine.Reflection.Compute.RecordError("Circular directory hierarchy found.");
+                BH.Engine.Base.Compute.RecordError("Circular directory hierarchy found.");
 
             return baseInfo.ToString();
         }
@@ -114,7 +114,7 @@ namespace BH.Engine.Adapters.File
             catch
             {
                 if (di == null || !di.Exists)
-                    BH.Engine.Reflection.Compute.RecordError($"Invalid path provided:\n`{path}`");
+                    BH.Engine.Base.Compute.RecordError($"Invalid path provided:\n`{path}`");
             }
 
 
@@ -131,7 +131,7 @@ namespace BH.Engine.Adapters.File
         //Fallback
         private static string FullPath(object fileOrDir)
         {
-            BH.Engine.Reflection.Compute.RecordError($"Can not compute the FullPath for an object of type `{fileOrDir.GetType().Name}`.");
+            BH.Engine.Base.Compute.RecordError($"Can not compute the FullPath for an object of type `{fileOrDir.GetType().Name}`.");
             return null;
         }
 

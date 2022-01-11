@@ -53,17 +53,17 @@ namespace BH.Adapter.File
                 if (request is Type)
                 {
                     pullRequest = new FileContentRequest() { File = m_defaultFilePath, Types = new List<Type>() { request as Type } };
-                    BH.Engine.Reflection.Compute.RecordNote($"Type interpreted as new {nameof(FileContentRequest)} targeting the Adapter targetLocation: `{m_defaultFilePath}` and filtering per type `{(request as Type).Name}`.");
+                    BH.Engine.Base.Compute.RecordNote($"Type interpreted as new {nameof(FileContentRequest)} targeting the Adapter targetLocation: `{m_defaultFilePath}` and filtering per type `{(request as Type).Name}`.");
                 }
                 else if (request is IEnumerable<Type>)
                 {
                     pullRequest = new FileContentRequest() { File = m_defaultFilePath, Types = (request as IEnumerable<Type>).ToList() };
-                    BH.Engine.Reflection.Compute.RecordNote($"Type interpreted as new {nameof(FileContentRequest)} targeting the Adapter targetLocation: `{m_defaultFilePath}` and filtering per types: {String.Join(", ",(request as IEnumerable<Type>).Select(t => t.Name))}.");
+                    BH.Engine.Base.Compute.RecordNote($"Type interpreted as new {nameof(FileContentRequest)} targeting the Adapter targetLocation: `{m_defaultFilePath}` and filtering per types: {String.Join(", ",(request as IEnumerable<Type>).Select(t => t.Name))}.");
                 }
                 else
                 {
                     pullRequest = new FileContentRequest() { File = m_defaultFilePath };
-                    BH.Engine.Reflection.Compute.RecordNote($"Pulling file contents from the Adapter targetLocation: `{m_defaultFilePath}`.");
+                    BH.Engine.Base.Compute.RecordNote($"Pulling file contents from the Adapter targetLocation: `{m_defaultFilePath}`.");
                 }
 
                 return true;
@@ -71,13 +71,13 @@ namespace BH.Adapter.File
 
             if (request == null && string.IsNullOrWhiteSpace(m_defaultFilePath))
             {
-                BH.Engine.Reflection.Compute.RecordError($"Please specify a valid Request, or create the {nameof(FileAdapter)} with the constructor that takes inputs to specify a target Location.");
+                BH.Engine.Base.Compute.RecordError($"Please specify a valid Request, or create the {nameof(FileAdapter)} with the constructor that takes inputs to specify a target Location.");
                 return false;
             }
 
             if ((request as IRequest) != null && !string.IsNullOrWhiteSpace(m_defaultFilePath))
             {
-                BH.Engine.Reflection.Compute.RecordWarning($"Both request and targetLocation have been specified. Requests take precedence. Pulling as specified by the input `{request.GetType().Name}`.");
+                BH.Engine.Base.Compute.RecordWarning($"Both request and targetLocation have been specified. Requests take precedence. Pulling as specified by the input `{request.GetType().Name}`.");
                 return true;
             }
 

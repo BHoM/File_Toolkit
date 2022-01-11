@@ -83,20 +83,20 @@ namespace BH.Adapter.File
                     System.IO.File.Delete(filePath);
 
                     if (recordNote)
-                        BH.Engine.Reflection.Compute.RecordNote($"File deleted: {filePath}");
+                        BH.Engine.Base.Compute.RecordNote($"File deleted: {filePath}");
 
                     return true;
                 }
                 else
                 {
-                    BH.Engine.Reflection.Compute.RecordWarning($"File not found: {filePath}");
+                    BH.Engine.Base.Compute.RecordWarning($"File not found: {filePath}");
                     return false;
                 }
 
             }
             catch (IOException ioExp)
             {
-                BH.Engine.Reflection.Compute.RecordError(ioExp.Message);
+                BH.Engine.Base.Compute.RecordError(ioExp.Message);
             }
 
             return false;
@@ -113,19 +113,19 @@ namespace BH.Adapter.File
                     System.IO.Directory.Delete(directoryPath);
 
                     if (recordNote)
-                        BH.Engine.Reflection.Compute.RecordNote($"Directory deleted: {directoryPath}");
+                        BH.Engine.Base.Compute.RecordNote($"Directory deleted: {directoryPath}");
 
                     return true;
                 }
                 else
                 {
-                    BH.Engine.Reflection.Compute.RecordWarning($"Directory not found: {directoryPath}");
+                    BH.Engine.Base.Compute.RecordWarning($"Directory not found: {directoryPath}");
                     return false;
                 }
             }
             catch (IOException ioExp)
             {
-                BH.Engine.Reflection.Compute.RecordError(ioExp.Message);
+                BH.Engine.Base.Compute.RecordError(ioExp.Message);
             }
 
             return false;

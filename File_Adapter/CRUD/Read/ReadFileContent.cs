@@ -56,7 +56,7 @@ namespace BH.Adapter.File
             output = readFile.Content ?? new List<object>();
 
             if (!output.Any())
-                BH.Engine.Reflection.Compute.RecordWarning($"No content could be pulled for {fileFullPath}. Make sure it's not protected or empty.");
+                BH.Engine.Base.Compute.RecordWarning($"No content could be pulled for {fileFullPath}. Make sure it's not protected or empty.");
 
             return output
                   .Where(o => fcr.Types.Count > 0 ? fcr.Types.Any(t => t == o.GetType()) : true)
@@ -75,7 +75,7 @@ namespace BH.Adapter.File
             if (extension == ".json")
                 retrievedObjects.AddRange(RetrieveJsonContent(fileFullPath));
             else
-                BH.Engine.Reflection.Compute.RecordNote($"Cannot read content of {fileFullPath}. Only JSON format is currently supported by the {typeof(FileAdapter).Name}.");
+                BH.Engine.Base.Compute.RecordNote($"Cannot read content of {fileFullPath}. Only JSON format is currently supported by the {typeof(FileAdapter).Name}.");
 
             return retrievedObjects;
         }
@@ -123,7 +123,7 @@ namespace BH.Adapter.File
             if (!isDatasetJson)
                 if (!FromJson(jsonText, out converted))
                 {
-                    Engine.Reflection.Compute.RecordWarning($"The content of file `{fileFullPath}` is not a supported json format.");
+                    Engine.Base.Compute.RecordWarning($"The content of file `{fileFullPath}` is not a supported json format.");
                     return result;
                 }
 
@@ -137,7 +137,7 @@ namespace BH.Adapter.File
                     if (FromJson(jsonLines[i], out readObj))
                         deserialised.Add(readObj);
                     else
-                        Engine.Reflection.Compute.RecordWarning($"Could not deserialise line {i} of the Dataset file {fileFullPath}.");
+                        Engine.Base.Compute.RecordWarning($"Could not deserialise line {i} of the Dataset file {fileFullPath}.");
                 }
 
                 converted = deserialised;

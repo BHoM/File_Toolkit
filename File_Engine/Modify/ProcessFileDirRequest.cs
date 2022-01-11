@@ -21,7 +21,7 @@
  */
 
 using BH.oM.Adapters.File;
-using BH.oM.Reflection.Attributes;
+using BH.oM.Base.Attributes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -54,7 +54,7 @@ namespace BH.Engine.Adapters.File
                     string allButLastSegment = fdr.Location.Remove(fdr.Location.Count() - Path.GetFileName(fdr.Location).Count());
                     if (WildcardPattern.ContainsWildcardCharacters(allButLastSegment))
                     {
-                        BH.Engine.Reflection.Compute.RecordError("Wildcards are only allowed in the last segment of the path.");
+                        BH.Engine.Base.Compute.RecordError("Wildcards are only allowed in the last segment of the path.");
                         return false;
                     }
                     else
@@ -63,14 +63,14 @@ namespace BH.Engine.Adapters.File
 
                 if (fdr.IncludeDirectories)
                 {
-                    BH.Engine.Reflection.Compute.RecordWarning($"The usage of Wildcards is limited to file retrievals: " +
+                    BH.Engine.Base.Compute.RecordWarning($"The usage of Wildcards is limited to file retrievals: " +
                         $"\ncannot have `{nameof(FileDirRequest)}.{nameof(fdr.IncludeDirectories)}` set to true while a Wildcard is specified in the path." +
                         $"\nDefaulting `{nameof(fdr.IncludeDirectories)}` to false and continuing.");
                     fdr.IncludeDirectories = false;
                 }
 
                 if (fdr.IncludeFileContents)
-                    BH.Engine.Reflection.Compute.RecordNote($"Note that `{nameof(fdr.IncludeFileContents)}` works only for BHoM-serialized JSON files.");
+                    BH.Engine.Base.Compute.RecordNote($"Note that `{nameof(fdr.IncludeFileContents)}` works only for BHoM-serialized JSON files.");
             }
 
             return true;
