@@ -68,7 +68,7 @@ namespace BH.Engine.Adapters.File
                 return false;
             }
 
-            // Serialize to json and create the file and directory.
+            // Serialise to json and create the file and directory.
             string json = Engine.Adapters.File.Convert.ToJsonArray(objects);
             System.IO.FileInfo fileInfo = new System.IO.FileInfo(filePath);
             fileInfo.Directory.Create(); // If the directory already exists, this method does nothing.
