@@ -28,6 +28,8 @@ using System.Linq;
 using BH.Engine.Serialiser;
 using BH.Engine.Adapters.File;
 using BH.oM.Adapters.File;
+using System.ComponentModel;
+using BH.oM.Base.Attributes;
 
 namespace BH.Engine.Adapters.File
 {
@@ -37,6 +39,10 @@ namespace BH.Engine.Adapters.File
         /**** Public Methods                            ****/
         /***************************************************/
 
+        [Description("Write a JSON-serialised file with the input data or objects.")]
+        [Input("filePath", "Path to the file.")]
+        [Input("replace", "If the file exists, you need to set this to true in order to allow overwriting it.")]
+        [Input("active", "Boolean used to trigger the function.")]
         public static bool WriteToJsonFile(List<object> objects, string filePath, bool replace = false, bool active = false)
         {
             if (!active)

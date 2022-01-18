@@ -31,6 +31,8 @@ using BH.oM.Adapters.File;
 using MongoDB.Bson;
 using System.Collections;
 using BH.oM.Adapter;
+using System.ComponentModel;
+using BH.oM.Base.Attributes;
 
 namespace BH.Engine.Adapters.File
 {
@@ -40,6 +42,9 @@ namespace BH.Engine.Adapters.File
         /**** Public Methods                            ****/
         /***************************************************/
 
+        [Description("Read a JSON-serialised file and output any data or object included in it.")]
+        [Input("filePath", "Path to the file.")]
+        [Input("active", "Boolean used to trigger the function.")]
         public static List<object> ReadFromJsonFile(string filePath, bool active = false)
         {
             if (!active)
