@@ -33,8 +33,8 @@
   <ItemGroup>
     <Reference Include="Adapter_oM">
       <HintPath>C:\ProgramData\BHoM\Assemblies\Adapter_oM.dll</HintPath>
-	  <Private>False</Private>
-	  <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+      <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="BHoM">
       <SpecificVersion>False</SpecificVersion>
@@ -58,8 +58,8 @@
     </Reference>
     <Reference Include="Serialiser_Engine">
       <HintPath>C:\ProgramData\BHoM\Assemblies\Serialiser_Engine.dll</HintPath>
-	  <Private>False</Private>
-	  <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+      <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -100,7 +100,6 @@
     <Compile Include="Objects\EqualityComparers\PathComparer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Modify\ProcessFileDirRequest.cs" />
-    <Compile Include="Convert\ToJsonArray.cs" />
     <Compile Include="Query\TryGetRegex.cs" />
     <Compile Include="Query\SortOrder.cs" />
     <Compile Include="Query\NestingDepth.cs" />

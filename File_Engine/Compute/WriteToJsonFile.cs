@@ -30,6 +30,7 @@ using BH.Engine.Adapters.File;
 using BH.oM.Adapters.File;
 using System.ComponentModel;
 using BH.oM.Base.Attributes;
+using BH.oM.Adapter;
 
 namespace BH.Engine.Adapters.File
 {
@@ -66,7 +67,7 @@ namespace BH.Engine.Adapters.File
             }
 
             // Serialise to json and create the file and directory.
-            string json = Engine.Adapters.File.Convert.ToJsonArray(objects);
+            string json = ToJsonArrayWrappingNonObjects(objects);
             System.IO.FileInfo fileInfo = new System.IO.FileInfo(filePath);
             fileInfo.Directory.Create(); // If the directory already exists, this method does nothing.
 
@@ -81,6 +82,49 @@ namespace BH.Engine.Adapters.File
             }
 
             return true;
+        }
+
+        /***************************************************/
+        /**** Private Methods                           ****/
+        /***************************************************/
+
+        // Writes to a JSON Array and wraps non-objects (primitive types) to allow to serialise them.
+        private static string ToJsonArrayWrappingNonObjects(this List<object> objects)
+        {
+            string json = "";
+            List<string> allLines = new List<string>();
+
+            // Parse all objects.
+            foreach (object obj in objects)
+            {
+                // Skip nulls.
+                if (obj == null)
+                    continue;
+
+                // Wrap non-IObjects.
+                IObject toWrite = obj as IObject;
+                if (toWrite == null)
+                    toWrite = WrapInBHoMObject(obj);
+
+                // Add to serialized list.
+                allLines.Add(toWrite.ToJson() + ",");
+            }
+
+            // Remove the trailing comma if there is only one element.
+            allLines[allLines.Count - 1] = allLines[allLines.Count - 1].Remove(allLines[allLines.Count - 1].Length - 1);
+
+            // Join all between square brackets to make a valid JSON array.
+            json = String.Join(Environment.NewLine, allLines);
+            json = "[" + json + "]";
+
+            return json;
+        }
+
+        /***************************************************/
+
+        private static ObjectWrapper WrapInBHoMObject(object obj)
+        {
+            return new ObjectWrapper() { WrappedObject = obj, Name = obj.GetType().FullName };
         }
     }
 }
