@@ -40,7 +40,7 @@ namespace BH.Engine.Adapters.File
         /*** Methods                                     ***/
         /***************************************************/
 
-        [Description("Serializes the objects and returns a json array.")]
+        [Description("Serialises the objects and returns a json array.")]
         [Input("objects", "Objects you want to serialize and concatenate into a single JSON array.")]
         [Output("jsonArray", "A JSON array with the serialized objects.")]
         public static string ToJsonArray(this List<object> objects)
