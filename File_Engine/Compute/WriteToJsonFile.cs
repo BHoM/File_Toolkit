@@ -62,7 +62,7 @@ namespace BH.Engine.Adapters.File
 
             // If the file exists already, stop execution if `replace` is not true.
             bool fileExisted = System.IO.File.Exists(filePath);
-            if (replace == false && fileExisted)
+            if (!replace && fileExisted)
             {
                 BH.Engine.Base.Compute.RecordWarning($"The file `{filePath}` exists already. To replace its content, set `{nameof(replace)}` to true.");
                 return false;
