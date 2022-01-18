@@ -32,7 +32,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Adapter_oM">
-      <HintPath>..\..\..\..\..\ProgramData\BHoM\Assemblies\Adapter_oM.dll</HintPath>
+      <HintPath>C:\ProgramData\BHoM\Assemblies\Adapter_oM.dll</HintPath>
+	  <Private>False</Private>
+	  <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="BHoM">
       <SpecificVersion>False</SpecificVersion>
@@ -56,6 +58,8 @@
     </Reference>
     <Reference Include="Serialiser_Engine">
       <HintPath>C:\ProgramData\BHoM\Assemblies\Serialiser_Engine.dll</HintPath>
+	  <Private>False</Private>
+	  <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
