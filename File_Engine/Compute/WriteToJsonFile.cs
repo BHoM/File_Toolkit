@@ -45,10 +45,7 @@ namespace BH.Engine.Adapters.File
         [Input("active", "Boolean used to trigger the function.")]
         public static bool WriteToJsonFile(List<object> objects, string filePath, bool replace = false, bool active = false)
         {
-            if (!active)
-                return false;
-
-            if (objects == null)
+            if (!active || objects == null)
                 return false;
 
             if (string.IsNullOrWhiteSpace(filePath))
