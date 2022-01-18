@@ -80,7 +80,6 @@ namespace BH.Engine.Adapters.File
             catch (Exception e)
             {
                 BH.Engine.Base.Compute.RecordError($"Error writing to file:\n\t{e.ToString()}");
-
                 return false;
             }
 
