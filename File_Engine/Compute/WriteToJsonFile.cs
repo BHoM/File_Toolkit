@@ -45,15 +45,14 @@ namespace BH.Engine.Adapters.File
             if (objects == null)
                 return false;
 
-            // Make sure no invalid chars are present.
-            filePath = Path.Combine(Path.GetDirectoryName(filePath), Path.GetFileName(filePath));
-
-            // Make sure the .json extension is present.
-            if (!filePath.ToLower().EndsWith(".json") || string.IsNullOrWhiteSpace(filePath))
+            if (string.IsNullOrWhiteSpace(filePath))
             {
-                BH.Engine.Base.Compute.RecordError($"The filePath `{filePath}` must point to a JSON file. Make sure the file extension `.json` is present.");
+                BH.Engine.Base.Compute.RecordError($"The filePath `{filePath}` must not be empty.");
                 return false;
             }
+
+            // Make sure no invalid chars are present.
+            filePath = Path.Combine(Path.GetDirectoryName(filePath), Path.GetFileName(filePath));
 
             // If the file exists already, stop execution if `replace` is not true.
             bool fileExisted = System.IO.File.Exists(filePath);
