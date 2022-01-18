@@ -49,7 +49,7 @@ namespace BH.Engine.Adapters.File
             filePath = Path.Combine(Path.GetDirectoryName(filePath), Path.GetFileName(filePath));
 
             // Make sure the .json extension is present.
-            if (!filePath.EndsWith(".json") || string.IsNullOrWhiteSpace(filePath))
+            if (!filePath.ToLower().EndsWith(".json") || string.IsNullOrWhiteSpace(filePath))
             {
                 BH.Engine.Base.Compute.RecordError($"The filePath `{filePath}` must point to a JSON file. Make sure the file extension `.json` is present.");
                 return false;

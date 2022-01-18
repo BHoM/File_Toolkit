@@ -45,7 +45,7 @@ namespace BH.Engine.Adapters.File
             if (!active)
                 return new List<object>();
 
-            if (!filePath.EndsWith(".json") || string.IsNullOrWhiteSpace(filePath))
+            if (!filePath.ToLower().EndsWith(".json") || string.IsNullOrWhiteSpace(filePath))
             {
                 BH.Engine.Base.Compute.RecordError($"The filePath `{filePath}` must point to a JSON file. Make sure the file extension `.json` is present.");
                 return new List<object>();
