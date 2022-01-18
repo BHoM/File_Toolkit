@@ -36,7 +36,7 @@ using BH.oM.Base.Attributes;
 
 namespace BH.Engine.Adapters.File
 {
-    public partial class Compute
+    public static partial class Compute
     {
         /***************************************************/
         /**** Public Methods                            ****/
