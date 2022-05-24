@@ -108,7 +108,6 @@
     <Compile Include="CRUD\Read\ReadFile.cs" />
     <Compile Include="Methods\AddExtraData.cs" />
     <Compile Include="Methods\CreateFSFile.cs" />
-    <Compile Include="Methods\CreateFSDirectory.cs" />
     <Compile Include="Methods\WalkDirectories.cs" />
     <Compile Include="FileAdapter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
