@@ -90,6 +90,7 @@
     <Compile Include="Convert\ToFiling\FSFile.cs" />
     <Compile Include="Convert\ToFiling\IContainer.cs" />
     <Compile Include="Convert\ToFiling\ILocatableResource.cs" />
+    <Compile Include="Create\FSDirectory.cs" />
     <Compile Include="Create\FileDirRequest.cs" />
     <Compile Include="Modify\RelativiseUserPath.cs" />
     <Compile Include="Modify\RemoveContent.cs" />

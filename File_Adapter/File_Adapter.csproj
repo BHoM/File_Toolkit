@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -156,7 +156,6 @@
     <Compile Include="CRUD\Read\ReadFile.cs" />
     <Compile Include="Methods\AddExtraData.cs" />
     <Compile Include="Methods\CreateFSFile.cs" />
-    <Compile Include="Methods\CreateFSDirectory.cs" />
     <Compile Include="Methods\WalkDirectories.cs" />
     <Compile Include="FileAdapter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
