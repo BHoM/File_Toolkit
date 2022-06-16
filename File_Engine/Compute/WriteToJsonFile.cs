@@ -92,6 +92,9 @@ namespace BH.Engine.Adapters.File
         private static string ToJsonArrayWrappingNonObjects(this List<object> objects)
         {
             string json = "";
+            if (objects.Count == 0)
+                return json;
+
             List<string> allLines = new List<string>();
 
             // Parse all objects.
