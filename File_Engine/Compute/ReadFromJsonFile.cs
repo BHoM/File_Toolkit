@@ -28,7 +28,6 @@ using System.Linq;
 using BH.Engine.Serialiser;
 using BH.Engine.Adapters.File;
 using BH.oM.Adapters.File;
-using MongoDB.Bson;
 using System.Collections;
 using BH.oM.Adapter;
 using System.ComponentModel;
