@@ -22,9 +22,6 @@
 
 using BH.oM.Adapter;
 using BH.oM.Base;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson.IO;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -155,41 +152,8 @@ namespace BH.Adapter.File
 
         public static bool FromJson(string json, out object result)
         {
-            result = null;
-
-            if (json == "")
-                return false;
-
-            if (json.StartsWith("{"))
-            {
-                BsonDocument document;
-                if (BsonDocument.TryParse(json, out document))
-                {
-                    result = BH.Engine.Serialiser.Convert.FromBson(document);
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-
-            if (json.StartsWith("["))
-            {
-                BsonArray array = MongoDB.Bson.Serialization.BsonSerializer.Deserialize<BsonArray>(json);
-
-                try
-                {
-                    result = array.Select(b => b.IsBsonDocument ? BH.Engine.Serialiser.Convert.FromBson(b.AsBsonDocument) : BH.Engine.Serialiser.Convert.FromJson(b.ToString())).ToList();
-                    return true;
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-
-            return false;
+            result = BH.Engine.Serialiser.Convert.FromJson(json);
+            return result != null;
         }
     }
 }
