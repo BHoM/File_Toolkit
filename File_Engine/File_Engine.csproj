@@ -117,12 +117,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>
-xcopy "$(TargetDir)$(TargetFileName)"  "C:\ProgramData\BHoM\Assemblies" /Y
-    
-xcopy "$(TargetDir)System.IO.Abstractions.TestingHelpers.dll"  "C:\ProgramData\BHoM\Assemblies" /Y
-    
-xcopy "$(TargetDir)System.IO.Abstractions.dll"  "C:\ProgramData\BHoM\Assemblies" /Y
-</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(TargetDir)$(TargetFileName)"  "C:\ProgramData\BHoM\Assemblies" /Y</PostBuildEvent>
   </PropertyGroup>
 </Project>
