@@ -73,6 +73,7 @@
     <Compile Include="FSDirectory.cs" />
     <Compile Include="enums\Encodings.cs" />
     <Compile Include="File.cs" />
+    <Compile Include="SerializationTestObj.cs" />
     <Compile Include="Interfaces\IFSResource.cs" />
     <Compile Include="Interfaces\ISizeableResource.cs" />
     <Compile Include="Interfaces\IContainableResource.cs" />
