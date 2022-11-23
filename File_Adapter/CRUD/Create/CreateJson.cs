@@ -29,7 +29,6 @@ using BH.Engine.Serialiser;
 using BH.oM.Adapter;
 using BH.Engine.Adapters.File;
 using BH.oM.Adapters.File;
-using System.Text.Json;
 using BH.Engine.Diffing;
 using BH.oM.Diffing;
 using BH.oM.Data.Library;
@@ -74,18 +73,6 @@ namespace BH.Adapter.File
                     // This is a newline-separated concatenation of individual JSON-serialized objects.
                     allLines.AddRange(file.Content.Where(c => c != null).Select(obj => obj.ToJson()));
                     json = String.Join(Environment.NewLine, allLines);
-                }
-
-                if (pushConfig.BeautifyJson)
-                {
-                    try
-                    {
-                        json = BeautifyJson(json);
-                    }
-                    catch (Exception e)
-                    {
-                        BH.Engine.Base.Compute.RecordWarning($"Beautify json failed. File will be created with non-beautified json. Error:\n{e.Message}");
-                    }
                 }
             }
 
@@ -274,39 +261,6 @@ namespace BH.Adapter.File
                     System.IO.File.AppendAllText(fullPath, Environment.NewLine + json);
                 }
             }
-        }
-
-        /***************************************************/
-        /**** Private Methods                           ****/
-        /***************************************************/
-
-        private static string BeautifyJson(string jsonString)
-        {
-            if (string.IsNullOrWhiteSpace(jsonString))
-                return jsonString;
-
-            JsonDocument doc = JsonDocument.Parse(
-                jsonString,
-                new JsonDocumentOptions
-                {
-                    AllowTrailingCommas = true
-                }
-            );
-            MemoryStream memoryStream = new MemoryStream();
-            using (
-                var utf8JsonWriter = new Utf8JsonWriter(
-                    memoryStream,
-                    new JsonWriterOptions
-                    {
-                        Indented = true
-                    }
-                )
-            )
-            {
-                doc.WriteTo(utf8JsonWriter);
-            }
-            return new System.Text.UTF8Encoding()
-                .GetString(memoryStream.ToArray());
         }
     }
 }
