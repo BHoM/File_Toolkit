@@ -46,10 +46,6 @@
       <HintPath>C:\ProgramData\BHoM\Assemblies\Data_oM.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Humans_oM">
-      <HintPath>C:\ProgramData\BHoM\Assemblies\Humans_oM.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -73,7 +69,6 @@
     <Compile Include="FSDirectory.cs" />
     <Compile Include="enums\Encodings.cs" />
     <Compile Include="File.cs" />
-    <Compile Include="SerializationTestObj.cs" />
     <Compile Include="Interfaces\IFSResource.cs" />
     <Compile Include="Interfaces\ISizeableResource.cs" />
     <Compile Include="Interfaces\IContainableResource.cs" />
