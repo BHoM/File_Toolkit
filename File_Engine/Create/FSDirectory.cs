@@ -40,9 +40,9 @@ namespace BH.Engine.Adapters.File
         /***************************************************/
 
         [Input("parentDirectory", "Path of parent Directory of the directory. You can also specify a string path.")]
-        [Input("directoryName", "Name of the directory.")]
-        [Input("content", "The content of the file.")]
-        [Description("Creates a oM.Adapters.Filing.File object.")]
+        [Input("dirFullPath", "Name of the directory.")]
+        [Description("Creates a oM.Adapters.File.FSDirectory object from the input full path.")]
+        [Output("The created oM.Adapters.File.FSDirectory object.")]
         public static oM.Adapters.File.FSDirectory FSDirectory(string dirFullPath)
         {
             if (Path.HasExtension(dirFullPath))
@@ -57,8 +57,8 @@ namespace BH.Engine.Adapters.File
 
         [Input("parentDirectory","Path of parent Directory of the directory. You can also specify a string path.")]
         [Input("directoryName", "Name of the directory.")]
-        [Input("content", "The content of the file.")]
-        [Description("Creates a oM.Adapters.Filing.File object.")]
+        [Description("Creates a oM.Adapters.File.FSDirectory object with the input directoryName in the input parentDirectory.")]
+        [Output("The created oM.Adapters.File.FSDirectory object.")]
         public static oM.Adapters.File.FSDirectory FSDirectory(oM.Adapters.File.FSDirectory parentDirectory, string directoryName)
         {
             if (Path.HasExtension(directoryName))
