@@ -39,7 +39,6 @@ namespace BH.Engine.Adapters.File
         /**** Private Methods                           ****/
         /***************************************************/
 
-        [Input("parentDirectory", "Path of parent Directory of the directory. You can also specify a string path.")]
         [Input("dirFullPath", "Name of the directory.")]
         [Description("Creates a oM.Adapters.File.FSDirectory object from the input full path.")]
         [Output("The created oM.Adapters.File.FSDirectory object.")]
