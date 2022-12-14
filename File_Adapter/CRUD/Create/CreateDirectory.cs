@@ -21,7 +21,6 @@
  */
 
 using BH.oM.Base;
-using MongoDB.Bson.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;

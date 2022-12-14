@@ -92,6 +92,7 @@ namespace BH.Engine.Adapters.File
         private static string ToJsonArrayWrappingNonObjects(this List<object> objects)
         {
             string json = "";
+
             List<string> allLines = new List<string>();
 
             // Parse all objects.
@@ -110,11 +111,16 @@ namespace BH.Engine.Adapters.File
                 allLines.Add(toWrite.ToJson() + ",");
             }
 
-            // Remove the trailing comma if there is only one element.
-            allLines[allLines.Count - 1] = allLines[allLines.Count - 1].Remove(allLines[allLines.Count - 1].Length - 1);
+            if (allLines.Any())
+            {
+                // Remove the trailing comma
+                allLines[allLines.Count - 1] = allLines[allLines.Count - 1].Remove(allLines[allLines.Count - 1].Length - 1);
 
-            // Join all between square brackets to make a valid JSON array.
-            json = String.Join(Environment.NewLine, allLines);
+                // Join all lines 
+                json = String.Join(Environment.NewLine, allLines);
+            }
+
+            // Add square brackets to make a valid JSON array.
             json = "[" + json + "]";
 
             return json;
