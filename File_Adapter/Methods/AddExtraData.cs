@@ -49,7 +49,8 @@ namespace BH.Adapter.File
             {
                 try
                 {
-                    retrievedFile.Owner = System.IO.File.GetAccessControl(fullPath)
+                    var fileInfo = new FileInfo(fullPath);
+                    retrievedFile.Owner = System.IO.FileSystemAclExtensions.GetAccessControl(fileInfo)
                                             .GetOwner(typeof(System.Security.Principal.NTAccount)).ToString();
                 }
                 catch
