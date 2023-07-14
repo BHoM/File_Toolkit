@@ -15,7 +15,7 @@
     <tags>BHoM File JSON aec</tags>
     <title></title>
     <dependencies>
-      <group targetFramework=".NetStandard2.0">
+      <group targetFramework="netstandard2.0">
         <dependency id="NETStandard.Library" version="2.0.3" />
       </group>
     </dependencies>
