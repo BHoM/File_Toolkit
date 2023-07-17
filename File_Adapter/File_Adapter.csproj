@@ -7,7 +7,7 @@
     <AssemblyVersion>6.0.0.0</AssemblyVersion>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <RootNamespace>BH.Adapter.File</RootNamespace>
-    <BaseOutputPath>..\Build\</BaseOutputPath>
+    <OutputPath>..\Build\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
