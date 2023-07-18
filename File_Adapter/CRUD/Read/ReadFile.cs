@@ -52,16 +52,20 @@ namespace BH.Adapter.File
             // Perform the "Read" = get the System.FileInfo, which will be the basis for our oM.Adapters.Filing.File
             FileInfo fi = new FileInfo(fullPath);
 
-            // Checks on config
-            if (!inclHidFiles && (fi.Attributes & FileAttributes.Hidden) > 0)
-                return null;
+            // Check if we have attributes
+            if ((int)fi.Attributes != -1)
+            {
+                // Checks on config
+                if (!inclHidFiles && (fi.Attributes & FileAttributes.Hidden) > 0)
+                    return null;
 
-            if (!inclSysFiles && (fi.Attributes & FileAttributes.System) > 0)
-                return null;
+                if (!inclSysFiles && (fi.Attributes & FileAttributes.System) > 0)
+                    return null;
 
-            // Checks on FileInfo
-            if ((fi.Attributes & FileAttributes.Directory) <= 0 && !fi.Exists)
-                return null;
+                // Checks on FileInfo
+                if ((fi.Attributes & FileAttributes.Directory) <= 0 && !fi.Exists)
+                    return null;
+            }
 
             // Convert the FileInfo to our oM.Adapters.Filing.File
             oM.Adapters.File.FSFile file = fi.ToFiling();
