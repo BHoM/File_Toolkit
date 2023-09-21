@@ -50,7 +50,13 @@ namespace BH.Engine.Adapters.File
             bf.Name = fi.Name;
             bf.Exists = fi.Exists;
             bf.IsReadOnly = fi.IsReadOnly;
-            bf.Size = (int)(fi.Length & 0xFFFFFFFF);
+            try
+            {
+                // If the file's attributes are corrupted, this may throw a FileNotFoundException.
+                // This was added as part of #168.
+                bf.Size = (int)(fi.Length & 0xFFFFFFFF);
+            } catch {}
+
             bf.Attributes = fi.Attributes;
             bf.CreationTimeUtc = fi.CreationTimeUtc;
             bf.ModifiedTimeUtc = fi.LastWriteTimeUtc;
