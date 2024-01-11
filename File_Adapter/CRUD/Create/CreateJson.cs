@@ -60,7 +60,7 @@ namespace BH.Adapter.File
                 if (!pushConfig.UseDatasetSerialization)
                 {
                     var content = file.Content;
-                    
+
                     bool valueTypesFound = false;
 
                     foreach (var obj in content)
@@ -70,6 +70,14 @@ namespace BH.Adapter.File
 
                         if (obj.GetType().IsValueType)
                         {
+                            if (!pushConfig.SkipUnsupportedTypes)
+                            {
+                                BH.Engine.Base.Compute.RecordError($"Invalid type encountered: {obj.GetType().FullName}. " +
+                                    $"Please either remove this from the input objects, or specify a {typeof(PushConfig).FullName} with {nameof(PushConfig.SkipUnsupportedTypes)} set to true.");
+                                
+                                return null;
+                            }
+
                             valueTypesFound = true;
                             continue;
                         }
@@ -78,7 +86,7 @@ namespace BH.Adapter.File
                     }
 
                     if (valueTypesFound)
-                        BH.Engine.Base.Compute.RecordWarning("Attempted to push directly some non-objects (value types, e.g. numbers), which were skipped. Please wrap those in a CustomObject if required.");
+                        BH.Engine.Base.Compute.RecordNote("Attempted to push directly some non-objects (value types, e.g. numbers), which were skipped. Please wrap those in a CustomObject if required.");
 
                     // Remove the trailing comma 
                     if (allLines.Count > 0)
