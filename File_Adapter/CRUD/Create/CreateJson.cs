@@ -32,6 +32,7 @@ using BH.oM.Adapters.File;
 using BH.Engine.Diffing;
 using BH.oM.Diffing;
 using BH.oM.Data.Library;
+using BH.Engine.Base;
 
 namespace BH.Adapter.File
 {
@@ -58,10 +59,38 @@ namespace BH.Adapter.File
 
                 if (!pushConfig.UseDatasetSerialization)
                 {
-                    allLines.AddRange(file.Content.Where(c => c != null).Select(obj => obj.ToJson() + ","));
+                    var content = file.Content;
 
-                    // Remove the trailing comma if there is only one element.
-                    allLines[allLines.Count - 1] = allLines[allLines.Count - 1].Remove(allLines[allLines.Count - 1].Length - 1);
+                    bool valueTypesFound = false;
+
+                    foreach (var obj in content)
+                    {
+                        if (obj == null)
+                            continue;
+
+                        if (obj.GetType().IsValueType)
+                        {
+                            if (!pushConfig.SkipUnsupportedTypes)
+                            {
+                                BH.Engine.Base.Compute.RecordError($"Invalid type encountered: {obj.GetType().FullName}. " +
+                                    $"Please either remove this from the input objects, or specify a {typeof(PushConfig).FullName} with {nameof(PushConfig.SkipUnsupportedTypes)} set to true.");
+                                
+                                return null;
+                            }
+
+                            valueTypesFound = true;
+                            continue;
+                        }
+
+                        allLines.Add(obj.ToJson() + ",");
+                    }
+
+                    if (valueTypesFound)
+                        BH.Engine.Base.Compute.RecordNote("Attempted to push directly some non-objects (value types, e.g. numbers), which were skipped. Please wrap those in a CustomObject if required.");
+
+                    // Remove the trailing comma 
+                    if (allLines.Count > 0)
+                        allLines[allLines.Count - 1] = allLines[allLines.Count - 1].Remove(allLines[allLines.Count - 1].Length - 1);
 
                     // Join all between square brackets to make a valid JSON array.
                     json = String.Join(Environment.NewLine, allLines);
