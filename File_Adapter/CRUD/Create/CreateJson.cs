@@ -32,6 +32,7 @@ using BH.oM.Adapters.File;
 using BH.Engine.Diffing;
 using BH.oM.Diffing;
 using BH.oM.Data.Library;
+using BH.Engine.Base;
 
 namespace BH.Adapter.File
 {
@@ -58,10 +59,30 @@ namespace BH.Adapter.File
 
                 if (!pushConfig.UseDatasetSerialization)
                 {
-                    allLines.AddRange(file.Content.Where(c => c != null).Select(obj => obj.ToJson() + ","));
+                    var content = file.Content;
+                    
+                    bool valueTypesFound = false;
 
-                    // Remove the trailing comma if there is only one element.
-                    allLines[allLines.Count - 1] = allLines[allLines.Count - 1].Remove(allLines[allLines.Count - 1].Length - 1);
+                    foreach (var obj in content)
+                    {
+                        if (obj == null)
+                            continue;
+
+                        if (obj.GetType().IsValueType)
+                        {
+                            valueTypesFound = true;
+                            continue;
+                        }
+
+                        allLines.Add(obj.ToJson() + ",");
+                    }
+
+                    if (valueTypesFound)
+                        BH.Engine.Base.Compute.RecordWarning("Attempted to push directly some non-objects (value types, e.g. numbers), which were skipped. Please wrap those in a CustomObject if required.");
+
+                    // Remove the trailing comma 
+                    if (allLines.Count > 0)
+                        allLines[allLines.Count - 1] = allLines[allLines.Count - 1].Remove(allLines[allLines.Count - 1].Length - 1);
 
                     // Join all between square brackets to make a valid JSON array.
                     json = String.Join(Environment.NewLine, allLines);
