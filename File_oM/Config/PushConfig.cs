@@ -40,7 +40,7 @@ namespace BH.oM.Adapters.File
             "\nThis is the current standard for Datasets.")]
         public bool UseDatasetSerialization { get; set; } = false;
 
-        [Description("By default, certain types cannot be pushed to Json as root-level objects, for example numbers." +
+        [Description("By default, certain types cannot be pushed to Json as root-level objects, for example numbers.\n" +
             "Set this option to `true` to allow skipping those types.")]
         public bool SkipUnsupportedTypes { get; set; } = false;
 
