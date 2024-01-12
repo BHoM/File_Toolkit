@@ -90,7 +90,7 @@ namespace BH.Adapter.File
 
                     // Remove the trailing comma 
                     if (allLines.Count > 0)
-                        allLines[allLines.Count - 1] = allLines[allLines.Count - 1].Remove(allLines[allLines.Count - 1].Length - 1);
+                        json = allLines.Aggregate((a, b) => a + "," + Environment.NewLine + b);
 
                     // Join all between square brackets to make a valid JSON array.
                     json = String.Join(Environment.NewLine, allLines);
