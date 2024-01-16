@@ -40,7 +40,7 @@ namespace BH.Engine.Adapters.File
         /**** Methods                                   ****/
         /***************************************************/
 
-        [Description("If an user path is specified – e.g. containing `C:\\Users\\SomeUser` – modifies SomeUser to match the current user.")]
+        [Description("If an user path is specified – e.g. containing `C:/Users/SomeUser` – modifies SomeUser to match the current user.")]
         public static string RelativiseUserPath(string path)
         {
             string relativisedPath = path;
