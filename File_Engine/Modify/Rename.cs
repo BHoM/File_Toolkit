@@ -41,6 +41,8 @@ namespace BH.Engine.Adapters.File
         [Input("fileOrDir", "The file or directory to rename.")]
         [Input("name", "The new name.")]
         [Output("The moved file object.")]
+        [PreviousVersion("7.1", "BH.Engine.Adapters.File.Modify.Rename(BH.oM.Adapters.File.FSFile, System.String)")]
+        [PreviousVersion("7.1", "BH.Engine.Adapters.File.Modify.Rename(BH.oM.Adapters.File.FSDirectory, System.String)")]
         public static IFSContainer IRename(this oM.Adapters.File.IFSContainer fileOrDir, string name)
         {
             fileOrDir = BH.Engine.Base.Query.ShallowClone(fileOrDir);
@@ -64,6 +66,18 @@ namespace BH.Engine.Adapters.File
             directory.Name = name;
             return directory;
         }
+
+        /***************************************************/
+        /**** Private interface methods - fallback      ****/
+        /***************************************************/
+
+        private static IFSContainer Rename(this IFSContainer container, string name)
+        {
+            BH.Engine.Base.Compute.RecordError($"Cannot rename FSContainers of type: {container.GetType().FullName}, please provide either an FSFile or FSDirectory object.");
+            return null;
+        }
+
+        /***************************************************/
     }
 }
 
