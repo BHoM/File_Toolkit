@@ -38,7 +38,7 @@ namespace BH.Engine.Adapters.File
         /***************************************************/
 
         [Description("Move a file or directory to a new parent directory.")]
-        [Input("file", "The file (or directory) to move.")]
+        [Input("fileOrDir", "The file or directory to move.")]
         [Input("to", "The new parent Directory.")]
         [Output("The moved file object.")]
         public static IFSContainer ChangeDirectory(this oM.Adapters.File.IFSContainer fileOrDir, oM.Adapters.File.FSDirectory to)

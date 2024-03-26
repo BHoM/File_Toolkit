@@ -40,7 +40,10 @@ namespace BH.Engine.Adapters.File
         /***************************************************/
 
         [Description("Combines two paths.")]
-        public static string PathCombine(string path1, string path2)
+        [Input("path1", "The left half of the path.")]
+        [Input("path2", "The right half of the path.")]
+        [Output("path", "The combined path.")]
+        public static string PathCombine(this string path1, string path2)
         {
             return Path.Combine(path1, path2);
         }
@@ -48,7 +51,9 @@ namespace BH.Engine.Adapters.File
         /***************************************************/
 
         [Description("Combines multiple string paths.")]
-        public static string PathCombine(List<string> paths)
+        [Input("paths", "The list of paths to combine, in order.")]
+        [Output("path", "The combined path.")]
+        public static string PathCombine(this List<string> paths)
         {
             return Path.Combine(paths.ToArray());
         }

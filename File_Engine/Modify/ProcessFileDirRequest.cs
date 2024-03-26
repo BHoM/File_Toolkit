@@ -40,37 +40,36 @@ namespace BH.Engine.Adapters.File
         /***************************************************/
 
         [Description("Get the contents of the file as a string, reading from its location.")]
-        [Input("file", "The file to get the contents of.")]
-        [Input("encoding", "The encoding to use to decode the data. If null (default) discovery will be attempted; defaults to UTF-8 if it can't be discovered.")]
-        [Output("The contents of the file.")]
-        public static bool ProcessFileDirRequest(this FileDirRequest fdr, out WildcardPattern wildcardPattern)
+        [Input("fileDirectoryRequest", "The file directory request to process.")]
+        [Output("success", "True if the wildcard pattern is valid.")]
+        public static bool ProcessFileDirRequest(this FileDirRequest fileDirectoryRequest, out WildcardPattern wildcardPattern)
         {
             wildcardPattern = null;
 
-            if (WildcardPattern.ContainsWildcardCharacters(fdr.Location))
+            if (WildcardPattern.ContainsWildcardCharacters(fileDirectoryRequest.Location))
             {
-                if (WildcardPattern.ContainsWildcardCharacters(fdr.Location))
+                if (WildcardPattern.ContainsWildcardCharacters(fileDirectoryRequest.Location))
                 {
-                    string allButLastSegment = fdr.Location.Remove(fdr.Location.Count() - Path.GetFileName(fdr.Location).Count());
+                    string allButLastSegment = fileDirectoryRequest.Location.Remove(fileDirectoryRequest.Location.Count() - Path.GetFileName(fileDirectoryRequest.Location).Count());
                     if (WildcardPattern.ContainsWildcardCharacters(allButLastSegment))
                     {
                         BH.Engine.Base.Compute.RecordError("Wildcards are only allowed in the last segment of the path.");
                         return false;
                     }
                     else
-                        wildcardPattern = new WildcardPattern(Path.GetFileName(fdr.Location));
+                        wildcardPattern = new WildcardPattern(Path.GetFileName(fileDirectoryRequest.Location));
                 }
 
-                if (fdr.IncludeDirectories)
+                if (fileDirectoryRequest.IncludeDirectories)
                 {
                     BH.Engine.Base.Compute.RecordWarning($"The usage of Wildcards is limited to file retrievals: " +
-                        $"\ncannot have `{nameof(FileDirRequest)}.{nameof(fdr.IncludeDirectories)}` set to true while a Wildcard is specified in the path." +
-                        $"\nDefaulting `{nameof(fdr.IncludeDirectories)}` to false and continuing.");
-                    fdr.IncludeDirectories = false;
+                        $"\ncannot have `{nameof(FileDirRequest)}.{nameof(fileDirectoryRequest.IncludeDirectories)}` set to true while a Wildcard is specified in the path." +
+                        $"\nDefaulting `{nameof(fileDirectoryRequest.IncludeDirectories)}` to false and continuing.");
+                    fileDirectoryRequest.IncludeDirectories = false;
                 }
 
-                if (fdr.IncludeFileContents)
-                    BH.Engine.Base.Compute.RecordNote($"Note that `{nameof(fdr.IncludeFileContents)}` works only for BHoM-serialized JSON files.");
+                if (fileDirectoryRequest.IncludeFileContents)
+                    BH.Engine.Base.Compute.RecordNote($"Note that `{nameof(fileDirectoryRequest.IncludeFileContents)}` works only for BHoM-serialized JSON files.");
             }
 
             return true;

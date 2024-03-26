@@ -46,6 +46,10 @@ namespace BH.Engine.Adapters.File
             return obj != null ? FullPath(obj as dynamic) ?? "" : "";
         }
 
+        /***************************************************/
+        /**** Private interface methods                 ****/
+        /***************************************************/
+
         private static string FullPath(this IFSInfo baseInfo)
         {
             if (baseInfo.ParentDirectory == null)
@@ -57,10 +61,14 @@ namespace BH.Engine.Adapters.File
             return baseInfo.ToString();
         }
 
+        /***************************************************/
+
         private static string FullPath(this IResourceRequest fdr)
         {
             return FullPath(fdr.Location);
         }
+
+        /***************************************************/
 
         private static string FullPath(this ILocatableResource fdr)
         {
@@ -77,6 +85,8 @@ namespace BH.Engine.Adapters.File
 
             return location;
         }
+
+        /***************************************************/
 
         private static string FullPath(this string path)
         {
@@ -128,7 +138,10 @@ namespace BH.Engine.Adapters.File
             return null;
         }
 
-        //Fallback
+        /***************************************************/
+        /**** Private interface methods - Fallback      ****/
+        /***************************************************/
+
         private static string FullPath(object fileOrDir)
         {
             BH.Engine.Base.Compute.RecordError($"Can not compute the FullPath for an object of type `{fileOrDir.GetType().Name}`.");

@@ -38,7 +38,7 @@ namespace BH.Engine.Adapters.File
         /***************************************************/
 
         [Description("Rename a file or directory.")]
-        [Input("file", "The file (or directory) to rename.")]
+        [Input("fileOrDir", "The file or directory to rename.")]
         [Input("name", "The new name.")]
         [Output("The moved file object.")]
         public static IFSContainer IRename(this oM.Adapters.File.IFSContainer fileOrDir, string name)
@@ -48,14 +48,18 @@ namespace BH.Engine.Adapters.File
         }
 
         /***************************************************/
+        /**** Private interface methods                 ****/
+        /***************************************************/
 
-        public static IFSContainer Rename(this FSFile file, string name)
+        private static IFSContainer Rename(this FSFile file, string name)
         {
             file.Name = name;
             return file;
         }
 
-        public static IFSContainer Rename(this FSDirectory directory, string name)
+        /***************************************************/
+
+        private static IFSContainer Rename(this FSDirectory directory, string name)
         {
             directory.Name = name;
             return directory;
