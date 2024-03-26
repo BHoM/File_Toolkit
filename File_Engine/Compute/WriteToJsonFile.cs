@@ -41,6 +41,7 @@ namespace BH.Engine.Adapters.File
         /***************************************************/
 
         [Description("Write a JSON-serialised file with the input data or objects.")]
+        [Input("objects", "Objects to write to the file.")]
         [Input("filePath", "Path to the file.")]
         [Input("replace", "If the file exists, you need to set this to true in order to allow overwriting it.")]
         [Input("active", "Boolean used to trigger the function.")]

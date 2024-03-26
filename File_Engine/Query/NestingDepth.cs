@@ -38,7 +38,9 @@ namespace BH.Engine.Adapters.File
         /***************************************************/
 
         [Description("Get the nesting depth of the input File or Directory, which is the total number of parent folders.")]
-        public static int NestingDepth(oM.Adapters.File.IFSInfo fileOrDir)
+        [Input("fileOrDir", "The file or directory to get the depth of.")]
+        [Output("count", "The number of parent folders that the file or directory has.")]
+        public static int NestingDepth(this oM.Adapters.File.IFSInfo fileOrDir)
         {
             int count = 0;
             while (fileOrDir.ParentDirectory != null)

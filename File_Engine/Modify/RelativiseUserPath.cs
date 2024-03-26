@@ -63,6 +63,8 @@ namespace BH.Engine.Adapters.File
             return relativisedPath;
         }
 
+        /***************************************************/
+
         // Get the user folder, in the form of C:\Users\UserName.
         // Written to work also for Windows versions prior to 10.
         private static string GetUserPath()
