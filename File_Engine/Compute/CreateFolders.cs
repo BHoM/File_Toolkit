@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2023, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2024, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -33,7 +33,7 @@ namespace BH.Engine.Adapters.File
     public static partial class Compute
     {
         [Description("Creates Directories and subdirectories for the specified path, if they do not exist. " +
-            "E.g. `C:\\folder2\\folder1` will create both folder2 and folder1 if they do not exist.")]
+            "E.g. `C:/folder2/folder1` will create both folder2 and folder1 if they do not exist.")]
         public static void CreateFolders(string parentFolder, bool active = false)
         {
             if (active)
@@ -41,6 +41,7 @@ namespace BH.Engine.Adapters.File
         }
     }
 }
+
 
 
 

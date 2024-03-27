@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2023, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2024, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -40,7 +40,7 @@ namespace BH.Engine.Adapters.File
         /**** Methods                                   ****/
         /***************************************************/
 
-        [Description("If an user path is specified – e.g. containing `C:\\Users\\SomeUser` – modifies SomeUser to match the current user.")]
+        [Description("If an user path is specified – e.g. containing `C:/Users/SomeUser` – modifies SomeUser to match the current user.")]
         public static string RelativiseUserPath(string path)
         {
             string relativisedPath = path;
@@ -63,6 +63,8 @@ namespace BH.Engine.Adapters.File
             return relativisedPath;
         }
 
+        /***************************************************/
+
         // Get the user folder, in the form of C:\Users\UserName.
         // Written to work also for Windows versions prior to 10.
         private static string GetUserPath()
@@ -77,6 +79,7 @@ namespace BH.Engine.Adapters.File
         }
     }
 }
+
 
 
 

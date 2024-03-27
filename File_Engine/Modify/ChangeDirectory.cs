@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2023, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2024, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -38,7 +38,7 @@ namespace BH.Engine.Adapters.File
         /***************************************************/
 
         [Description("Move a file or directory to a new parent directory.")]
-        [Input("file", "The file (or directory) to move.")]
+        [Input("fileOrDir", "The file or directory to move.")]
         [Input("to", "The new parent Directory.")]
         [Output("The moved file object.")]
         public static IFSContainer ChangeDirectory(this oM.Adapters.File.IFSContainer fileOrDir, oM.Adapters.File.FSDirectory to)
@@ -51,6 +51,7 @@ namespace BH.Engine.Adapters.File
         /***************************************************/
     }
 }
+
 
 
 
