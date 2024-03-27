@@ -63,9 +63,8 @@ namespace BH.Adapter.File
 
                     bool valueTypesFound = false;
 
-                    for (int i = 0; i < content.Count; i++)
+                    foreach (var obj in content)
                     {
-                        object obj = content[i];
                         if (obj == null)
                             continue;
 
@@ -83,10 +82,7 @@ namespace BH.Adapter.File
                             continue;
                         }
 
-                        if (i != content.Count)
-                            allLines.Add(obj.ToJson() + ",");
-                        else
-                            allLines.Add(obj.ToJson());
+                        allLines.Add(obj.ToJson());
                     }
 
                     if (valueTypesFound)
