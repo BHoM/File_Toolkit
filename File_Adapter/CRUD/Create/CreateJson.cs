@@ -82,7 +82,7 @@ namespace BH.Adapter.File
                             continue;
                         }
 
-                        allLines.Add(obj.ToJson() + ",");
+                        allLines.Add(obj.ToJson());
                     }
 
                     if (valueTypesFound)
