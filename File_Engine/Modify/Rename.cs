@@ -41,8 +41,6 @@ namespace BH.Engine.Adapters.File
         [Input("fileOrDir", "The file or directory to rename.")]
         [Input("name", "The new name.")]
         [Output("The moved file object.")]
-        [PreviousVersion("7.1", "BH.Engine.Adapters.File.Modify.Rename(BH.oM.Adapters.File.FSFile, System.String)")]
-        [PreviousVersion("7.1", "BH.Engine.Adapters.File.Modify.Rename(BH.oM.Adapters.File.FSDirectory, System.String)")]
         public static IFSContainer IRename(this oM.Adapters.File.IFSContainer fileOrDir, string name)
         {
             fileOrDir = BH.Engine.Base.Query.ShallowClone(fileOrDir);
