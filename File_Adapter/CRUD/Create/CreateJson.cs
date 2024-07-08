@@ -63,6 +63,8 @@ namespace BH.Adapter.File
 
                     bool valueTypesFound = false;
 
+                    int objCount = 0;
+
                     foreach (var obj in content)
                     {
                         if (obj == null)
@@ -83,6 +85,7 @@ namespace BH.Adapter.File
                         }
 
                         allLines.Add(obj.ToJson());
+                        objCount++;
                     }
 
                     if (valueTypesFound)
@@ -93,8 +96,10 @@ namespace BH.Adapter.File
                         json = allLines.Aggregate((a, b) => a + "," + Environment.NewLine + b);
 
                     // Join all between square brackets to make a valid JSON array.
-                    json = String.Join(Environment.NewLine, allLines);
-                    json = "[" + json + "]";
+                    //json = String.Join(Environment.NewLine, allLines);
+
+                    if(objCount > 1)
+                        json = "[" + json + "]";
                 }
                 else
                 {
