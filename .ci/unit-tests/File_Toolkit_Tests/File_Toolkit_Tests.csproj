@@ -7,8 +7,8 @@
 
     <IsPackable>false</IsPackable>
     <Description>https://github.com/BHoM/File_Toolkit</Description>
-    <FileVersion>7.3.0.0</FileVersion>
-    <AssemblyVersion>7.0.0.0</AssemblyVersion>
+    <FileVersion>8.0.0.0</FileVersion>
+    <AssemblyVersion>8.0.0.0</AssemblyVersion>
     <Configurations>Debug;Release;Test</Configurations>
   </PropertyGroup>
 
