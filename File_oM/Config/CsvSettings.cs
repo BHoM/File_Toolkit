@@ -20,22 +20,25 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+using BH.oM.Adapter;
+using System.ComponentModel;
 
 namespace BH.oM.Adapters.File
 {
-    public enum FileFormat
+    public class CsvSettings : ActionConfig
     {
-        JSON,
-        BSON,
-        XML,
-        TXT,
-        CSV,
-        byteArray
+        [Description(" The delimiter to use in the CSV file. Common options are ',' for comma, ';' for semicolon, and '\\t' for tab by default.")]
+        public string Delimiter { get; set; } = "\t";
+
+        [Description(" If specified, numerical values will be rounded to this number of decimal places. If null, no rounding is applied.")]
+        public int? Digit { get; set; } = null;
+
+        [Description(" Whether to include a header row with column names in the CSV file.")]
+        public bool IncludeHeader { get; set; } = true;
+
+        [Description(" Whether to include an index column at the start of the CSV file.")]
+        public bool IncludeIndex { get; set; } = false;
     }
 }
 
