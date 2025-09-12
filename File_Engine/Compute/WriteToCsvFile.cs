@@ -88,7 +88,7 @@ namespace BH.Engine.Adapters.File
         /**** Private Methods                           ****/
         /***************************************************/
 
-        // Convert a list of objects to a CSV text string, taking care of the following types: List<List<string>>, List<string>, string[,], string[][], string[]
+        // Convert a list of objects to a CSV text string, taking care of the following types: List<List<object>>, List<object>, object[,], object[][], object[]
         public static string FromObject(this object obj, CsvSettings settings = null)
         {
             if (settings == null)
@@ -242,7 +242,7 @@ namespace BH.Engine.Adapters.File
                 {
                     int digits = (int) settings.Digit.Value;
                     var format = digits > 0 ? "0." + new string('#', digits) : "0";
-                    return Math.Round(d, digits).ToString(format, CultureInfo.InvariantCulture);
+                    raw = Math.Round(d, digits).ToString(format, CultureInfo.InvariantCulture);
                 }
                 else
                 {
