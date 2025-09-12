@@ -94,9 +94,7 @@ namespace BH.Engine.Adapters.File
         {
             if (settings == null)
                 settings = new CsvSettings();
-
-            var delim = settings.Delimiter ?? "\t";
-
+                        
             // 1) Normalize to list of rows (each row = string[])
             var rows = new List<string[]>();
 
@@ -193,20 +191,8 @@ namespace BH.Engine.Adapters.File
                 }
             }
 
-            // 3) Optional 1-based index column
-            if (settings.IncludeIndex)
-            {
-                for (int i = 0; i < rows.Count; i++)
-                {
-                    var current = rows[i];
-                    var newRow = new string[current.Length + 1];
-                    newRow[0] = (i + 1).ToString(CultureInfo.InvariantCulture);
-                    Array.Copy(current, 0, newRow, 1, current.Length);
-                    rows[i] = newRow;
-                }
-            }
-
-            // 4) Serialize with CSV escaping
+            // 3) Serialize with CSV escaping
+            var delim = settings.Delimiter ?? "\t";
             var sb = new StringBuilder(rows.Count * maxCols * 4);
             for (int i = 0; i < rows.Count; i++)
             {
