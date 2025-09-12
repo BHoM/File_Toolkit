@@ -31,12 +31,6 @@ namespace BH.oM.Adapters.File
         [Description(" The delimiter to use in the CSV file. Common options are ',' for comma, ';' for semicolon, and '\\t' for tab by default.")]
         public string Delimiter { get; set; } = "\t";
 
-        [Description(" Whether to include a header row with column names in the CSV file.")]
-        public bool IncludeHeader { get; set; } = true;
-
-        [Description(" Whether to include an index column at the start of the CSV file.")]
-        public bool IncludeIndex { get; set; } = false;
-
         [Description(" Whether to include objects that do not have a string representation. If true, these objects will be included using their ToString() method or a placeholder if not available. If false, such objects will be skipped.")]
         public bool IncludeObjects { get; set; } = false;
 
