@@ -67,7 +67,7 @@ namespace BH.Engine.Adapters.File
             }
 
             // Serialise to json and create the file and directory.
-            string table = FromObject(data);
+            string table = FromObject(data,settings);
             System.IO.FileInfo fileInfo = new System.IO.FileInfo(filePath);
             fileInfo.Directory.Create(); // If the directory already exists, this method does nothing.
 
@@ -237,14 +237,25 @@ namespace BH.Engine.Adapters.File
             {
                 double d = System.Convert.ToDouble(value, CultureInfo.InvariantCulture);
 
+                string raw;
                 if (settings.Digit.HasValue)
                 {
                     int digits = (int) settings.Digit.Value;
                     var format = digits > 0 ? "0." + new string('#', digits) : "0";
                     return Math.Round(d, digits).ToString(format, CultureInfo.InvariantCulture);
                 }
+                else
+                {
+                    raw = d.ToString("G", CultureInfo.InvariantCulture);
+                }
 
-                return d.ToString("G", CultureInfo.InvariantCulture);
+                // Apply custom decimal separator if needed
+                if (settings.DecimalSeparator != "." && raw.Contains("."))
+                {
+                    raw = raw.Replace(".", settings.DecimalSeparator);
+                }
+
+                return raw;
             }
 
             // Date/Time
