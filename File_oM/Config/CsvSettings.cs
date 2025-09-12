@@ -31,14 +31,24 @@ namespace BH.oM.Adapters.File
         [Description(" The delimiter to use in the CSV file. Common options are ',' for comma, ';' for semicolon, and '\\t' for tab by default.")]
         public string Delimiter { get; set; } = "\t";
 
-        [Description(" If specified, numerical values will be rounded to this number of decimal places. If null, no rounding is applied.")]
-        public int? Digit { get; set; } = null;
-
         [Description(" Whether to include a header row with column names in the CSV file.")]
         public bool IncludeHeader { get; set; } = true;
 
         [Description(" Whether to include an index column at the start of the CSV file.")]
         public bool IncludeIndex { get; set; } = false;
+
+        [Description(" Whether to include objects that do not have a string representation. If true, these objects will be included using their ToString() method or a placeholder if not available. If false, such objects will be skipped.")]
+        public bool IncludeObjects { get; set; } = false;
+
+        [Description(" The character to use as the decimal separator in numerical values. Common options are '.' for dot and ',' for comma. Default is '.'")]
+        public string DecimalSeparator { get; set; } = ".";
+
+        [Description(" If specified, numerical values will be rounded to this number of decimal places. If null, no rounding is applied.")]
+        public double? Digit { get; set; } = null;
+
+        [Description(" The format to use for date values. Options include ISO8601 (e.g., 2023-10-05T14:48:00Z), US (e.g., 10/05/2023), and EU (e.g., 05/10/2023). Default is ISO8601.")]
+        public DateFormatOptions DateTimeFormat { get; set; } = DateFormatOptions.EU;
+
     }
 }
 

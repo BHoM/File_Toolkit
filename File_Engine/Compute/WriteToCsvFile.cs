@@ -20,20 +20,16 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
-using BH.Engine.Adapters.File;
-using BH.Engine.Serialiser;
-using BH.oM.Adapter;
 using BH.oM.Adapters.File;
-using BH.oM.Base;
 using BH.oM.Base.Attributes;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+
 
 namespace BH.Engine.Adapters.File
 {
@@ -48,9 +44,9 @@ namespace BH.Engine.Adapters.File
         [Input("filePath", "Path to the file.")]
         [Input("replace", "If the file exists, you need to set this to true in order to allow overwriting it.")]
         [Input("active", "Boolean used to trigger the function.")]
-        public static bool WriteToCsvFile(List<object> lines, string filePath, CsvSettings settings = null, bool replace = false, bool active = false)
+        public static bool WriteToCsvFile(object data, string filePath, CsvSettings settings = null, bool replace = false, bool active = false)
         {
-            if (!active || lines == null)
+            if (!active || data == null)
                 return false;
 
             if (string.IsNullOrWhiteSpace(filePath))
@@ -71,7 +67,7 @@ namespace BH.Engine.Adapters.File
             }
 
             // Serialise to json and create the file and directory.
-            string table = From2DArray(lines);
+            string table = FromObject(data);
             System.IO.FileInfo fileInfo = new System.IO.FileInfo(filePath);
             fileInfo.Directory.Create(); // If the directory already exists, this method does nothing.
 
@@ -93,20 +89,20 @@ namespace BH.Engine.Adapters.File
         /***************************************************/
 
         // Convert a list of objects to a CSV text string, taking care of the following types: List<List<string>>, List<string>, string[,], string[][], string[]
-        public static string From2DArray(this object obj, CsvSettings settings = null)
+        public static string FromObject(this object obj, CsvSettings settings = null)
         {
             if (settings == null)
                 settings = new CsvSettings();
 
             var delim = settings.Delimiter ?? "\t";
 
-            // Normalize to list of rows (each row = string[])
+            // 1) Normalize to list of rows (each row = string[])
             var rows = new List<string[]>();
 
             switch (obj)
             {
-                // Rectangular array
-                case string[,] rect:
+                // --- PRIMARY: Rectangular arrays of objects ---
+                case object[,] rect:
                     {
                         int r = rect.GetLength(0);
                         int c = rect.GetLength(1);
@@ -114,46 +110,61 @@ namespace BH.Engine.Adapters.File
                         {
                             var row = new string[c];
                             for (int j = 0; j < c; j++)
-                                row[j] = rect[i, j] ?? string.Empty;
+                                row[j] = ToCellString(rect[i, j], settings);
                             rows.Add(row);
                         }
                         break;
                     }
 
-                // Jagged array
-                case string[][] jagged:
+                // --- PRIMARY: Jagged arrays of objects ---
+                case object[][] jagged:
                     {
-                        foreach (var row in jagged)
-                            rows.Add((row ?? Array.Empty<string>()).Select(v => v ?? string.Empty).ToArray());
+                        foreach (var inner in jagged ?? new object[0][])
+                        {
+                            var src = inner ?? new object[0];
+                            var row = new string[src.Length];
+                            for (int j = 0; j < src.Length; j++)
+                                row[j] = ToCellString(src[j], settings);
+                            rows.Add(row);
+                        }
                         break;
                     }
 
-                // Any "sequence of sequences of string" (List<List<string>>, IEnumerable<string[]>, etc.)
-                case IEnumerable<IEnumerable<string>> seqOfSeq:
+                // --- SECONDARY: Sequences of sequences of objects ---
+                case IEnumerable<IEnumerable<object>> seqOfSeq:
                     {
                         foreach (var inner in seqOfSeq)
-                            rows.Add((inner ?? Enumerable.Empty<string>()).Select(v => v ?? string.Empty).ToArray());
+                        {
+                            var items = inner ?? new object[0];
+                            var rowList = new List<string>();
+                            foreach (var it in items)
+                                rowList.Add(ToCellString(it, settings));
+                            rows.Add(rowList.ToArray());
+                        }
                         break;
                     }
 
-                // Any "sequence of string" (treated as a single row); exclude string itself
-                case IEnumerable<string> seq when !(obj is string):
+                // --- SECONDARY: Sequence of objects (single row); exclude string itself ---
+                case IEnumerable<object> seq when !(obj is string):
                     {
-                        rows.Add(seq.Select(v => v ?? string.Empty).ToArray());
+                        var rowList = new List<string>();
+                        foreach (var it in seq)
+                            rowList.Add(ToCellString(it, settings));
+                        rows.Add(rowList.ToArray());
                         break;
                     }
 
-                // Single string cell
+                // Single string -> one cell
                 case string s:
                     {
                         rows.Add(new[] { s });
                         break;
                     }
 
-                // Fallback: single cell ToString()
+                // Fallback: single cell from ToString()
                 default:
                     {
-                        rows.Add(new[] { obj?.ToString() ?? string.Empty });
+                        rows.Add(new[] { ToCellString(obj, settings) });
                         break;
                     }
             }
@@ -161,50 +172,40 @@ namespace BH.Engine.Adapters.File
             if (rows.Count == 0)
                 return string.Empty;
 
-            // Pad ragged rows
-            int maxCols = rows.Max(r => r == null ? 0 : r.Length);
+            // 2) Pad ragged rows to the maximum width
+            int maxCols = 0;
+            for (int i = 0; i < rows.Count; i++)
+            {
+                var r = rows[i] ?? new string[0];
+                if (r.Length > maxCols) maxCols = r.Length;
+            }
             if (maxCols == 0) maxCols = 1;
 
             for (int i = 0; i < rows.Count; i++)
             {
-                var r = rows[i] ?? Array.Empty<string>();
+                var r = rows[i] ?? new string[0];
                 if (r.Length < maxCols)
-                    rows[i] = r.Concat(Enumerable.Repeat(string.Empty, maxCols - r.Length)).ToArray();
+                {
+                    var padded = new string[maxCols];
+                    Array.Copy(r, padded, r.Length); // remaining are null -> treated as empty
+                    rows[i] = padded;
+                }
             }
 
-            // Optional index column (1-based)
+            // 3) Optional 1-based index column
             if (settings.IncludeIndex)
             {
                 for (int i = 0; i < rows.Count; i++)
                 {
-                    var newRow = new string[rows[i].Length + 1];
+                    var current = rows[i];
+                    var newRow = new string[current.Length + 1];
                     newRow[0] = (i + 1).ToString(CultureInfo.InvariantCulture);
-                    Array.Copy(rows[i], 0, newRow, 1, rows[i].Length);
+                    Array.Copy(current, 0, newRow, 1, current.Length);
                     rows[i] = newRow;
                 }
             }
 
-            // Numeric rounding (if requested)
-            if (settings.Digit.HasValue)
-            {
-                int digits = settings.Digit.Value;
-                var format = digits > 0 ? "0." + new string('#', digits) : "0";
-
-                for (int i = 0; i < rows.Count; i++)
-                {
-                    for (int j = 0; j < rows[i].Length; j++)
-                    {
-                        var v = rows[i][j];
-                        double num;
-                        if (TryParseNumber(v, out num))
-                        {
-                            rows[i][j] = Math.Round(num, digits).ToString(format, CultureInfo.InvariantCulture);
-                        }
-                    }
-                }
-            }
-
-            // Serialize with escaping
+            // 4) Serialize with CSV escaping
             var sb = new StringBuilder(rows.Count * maxCols * 4);
             for (int i = 0; i < rows.Count; i++)
             {
@@ -217,21 +218,77 @@ namespace BH.Engine.Adapters.File
             return sb.ToString();
         }
 
+        /*******************************************/
+        /**** Private Methods                  *****/
+        /*******************************************/
 
-        // --- Helpers ---
-
-        private static bool TryParseNumber(string s, out double value)
+        private static string ToCellString(object value, CsvSettings settings)
         {
-            // Try strict parse with InvariantCulture; also try trimming spaces.
-            if (double.TryParse(s, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out value))
-                return true;
+            if (value == null)
+                return string.Empty;
 
-            if (double.TryParse((s ?? string.Empty).Trim(), NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out value))
-                return true;
+            // string
+            var s = value as string;
+            if (s != null)
+                return s;
 
-            // Optional: try replacing comma with dot if it looks like a localized decimal
-            var swapped = (s ?? string.Empty).Replace(',', '.');
-            return double.TryParse(swapped, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out value);
+            // numeric (round if Digit set)
+            if (IsNumeric(value))
+            {
+                double d = System.Convert.ToDouble(value, CultureInfo.InvariantCulture);
+
+                if (settings.Digit.HasValue)
+                {
+                    int digits = (int) settings.Digit.Value;
+                    var format = digits > 0 ? "0." + new string('#', digits) : "0";
+                    return Math.Round(d, digits).ToString(format, CultureInfo.InvariantCulture);
+                }
+
+                return d.ToString("G", CultureInfo.InvariantCulture);
+            }
+
+            // Date/Time
+            if (value is DateTime dt)
+                return dt.FormatDate(settings.DateTimeFormat);
+
+
+            // Bool
+            if (value is bool b)
+                return b ? "true" : "false";
+
+            // Enum
+            var type = value.GetType();
+            if (type.IsEnum)
+                return System.Convert.ToString(value, CultureInfo.InvariantCulture);
+
+            // IFormattable (decimal, Guid, etc.)
+            var formattable = value as IFormattable;
+
+            if (formattable != null)
+                return formattable.ToString(null, CultureInfo.InvariantCulture);
+
+            if (settings.IncludeObjects)
+            {
+                // Fallback: use ToString() if overridden
+                var toString = value.ToString();
+                if (toString != null && toString != type.FullName)
+                    return toString;
+                // Fallback: type name
+                return $"<{type.Name}>";
+            }
+
+            // Fallback
+            return string.Empty;
+        }
+
+        private static bool IsNumeric(object value)
+        {
+            return value is byte || value is sbyte ||
+                   value is short || value is ushort ||
+                   value is int || value is uint ||
+                   value is long || value is ulong ||
+                   value is float || value is double ||
+                   value is decimal;
         }
 
         private static string EscapeCsv(string input, string delimiter)
@@ -239,72 +296,35 @@ namespace BH.Engine.Adapters.File
             if (input == null) return string.Empty;
 
             bool mustQuote =
-                input.Contains('"') ||
-                input.Contains('\n') ||
-                input.Contains('\r') ||
-                (!string.IsNullOrEmpty(delimiter) && input.Contains(delimiter));
+                input.IndexOf('"') >= 0 ||
+                input.IndexOf('\n') >= 0 ||
+                input.IndexOf('\r') >= 0 ||
+                (!string.IsNullOrEmpty(delimiter) && input.IndexOf(delimiter, StringComparison.Ordinal) >= 0);
 
             if (!mustQuote)
                 return input;
 
-            // Double quotes inside quoted field
             var doubled = input.Replace("\"", "\"\"");
-            return $"\"{doubled}\"";
+            return "\"" + doubled + "\"";
         }
 
-
-        private static bool IsEnumerableOfEnumerableOfString(object x, out IEnumerable<IEnumerable<string>> result)
+        private static string FormatDate(this IFormattable date, DateFormatOptions option)
         {
-            result = null;
-
-            if (x == null || x is string) return false;
-
-            var outer = x as IEnumerable;
-            if (outer == null) return false;
-
-            var rows = new List<IEnumerable<string>>();
-
-            foreach (var inner in outer)
+            switch (option)
             {
-                if (!IsEnumerableOfString(inner, out var row))
-                    return false; // any inner not IEnumerable<string> -> fail
-                rows.Add(row);
+                case DateFormatOptions.ISO8601:
+                    // round-trip, always UTC if DateTime.Kind is UTC
+                    return date.ToString("o", CultureInfo.InvariantCulture);
+
+                case DateFormatOptions.US:
+                    // month/day/year
+                    return date.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture);
+
+                case DateFormatOptions.EU:
+                default:
+                    // day/month/year
+                    return date.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
             }
-
-            result = rows;
-            return true;
         }
-
-        private static bool IsEnumerableOfString(object x, out IEnumerable<string> result)
-        {
-            result = null;
-
-            // Exclude string itself (it is IEnumerable<char>)
-            if (x == null || x is string) return false;
-
-            var enumerable = x as IEnumerable;
-            if (enumerable == null) return false;
-
-            var list = new List<string>();
-            foreach (var item in enumerable)
-            {
-                if (item == null) { list.Add(string.Empty); continue; }
-                var str = item as string;
-                if (str == null) return false; // not a pure IEnumerable<string>
-                list.Add(str);
-            }
-
-            result = list;
-            return true;
-        }
-
-
     }
 }
-
-
-
-
-
-
-
