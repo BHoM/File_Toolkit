@@ -39,9 +39,10 @@ namespace BH.Engine.Adapters.File
         /**** Public Methods                            ****/
         /***************************************************/
 
-        [Description("Write a JSON-serialised file with the input data or objects.")]
-        [Input("objects", "Objects to write to the file.")]
+        [Description("Write a CSV file with the input data or objects.")]
+        [Input("data", "Data to write to the file.")]
         [Input("filePath", "Path to the file.")]
+        [Input("settings", "Settings to use when writing the CSV file. If null, default settings will be used.")]
         [Input("replace", "If the file exists, you need to set this to true in order to allow overwriting it.")]
         [Input("active", "Boolean used to trigger the function.")]
         public static bool WriteToCsvFile(object data, string filePath, CsvSettings settings = null, bool replace = false, bool active = false)
