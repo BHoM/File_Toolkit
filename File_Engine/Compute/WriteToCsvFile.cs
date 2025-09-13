@@ -237,7 +237,7 @@ namespace BH.Engine.Adapters.File
                             return string.Empty;
 
                     case StringType.Date:
-                        if (value is DateTime date)
+                        if (value is IFormattable date)
                             return date.FormatDate(settings.DateTimeFormat);
                         else
                             return string.Empty;
@@ -284,30 +284,49 @@ namespace BH.Engine.Adapters.File
             if (settings.IncludeObjects)
                 return value.FormatObject();
 
-            // Fallback
+
             return string.Empty;
         }
 
-        private static string FormatDate(this DateTime date, DateFormatOptions option)
+        private static string FormatDate(this IFormattable date, DateFormatOptions option)
         {
             if (date == null)
                 return string.Empty;
 
-            switch (option)
+            // Handle Excel-style serial number (double)
+            if (date is double serial)
             {
-                case DateFormatOptions.ISO8601:
-                    // round-trip, always UTC if DateTime.Kind is UTC
-                    return date.ToString("o", CultureInfo.InvariantCulture);
-
-                case DateFormatOptions.US:
-                    // month/day/year
-                    return date.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture);
-
-                case DateFormatOptions.EU:
-                default:
-                    // day/month/year
-                    return date.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
+                try
+                {
+                    var dt = DateTime.FromOADate(serial);
+                    return dt.FormatDate(option); 
+                }
+                catch
+                {
+                    return serial.ToString(CultureInfo.InvariantCulture);
+                }
             }
+
+            // Handle DateTime
+            if (date is DateTime dt2)
+                return dt2.FormatDate(option);
+
+            // Handle DateTimeOffset
+            if (date is DateTimeOffset dto)
+            {
+                switch (option)
+                {
+                    case DateFormatOptions.ISO8601:
+                        return dto.ToString("o", CultureInfo.InvariantCulture);
+                    case DateFormatOptions.US:
+                        return dto.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture);
+                    case DateFormatOptions.EU:
+                    default:
+                        return dto.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
+                }
+            }
+
+            return date.ToString(null, CultureInfo.InvariantCulture);
         }
 
         private static string FormatNumeric(this IFormattable number, int? digits, string decimalSeparator)
