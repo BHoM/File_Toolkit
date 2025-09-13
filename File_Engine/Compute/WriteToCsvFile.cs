@@ -20,6 +20,7 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
+using BH.Engine.Base;
 using BH.oM.Adapters.File;
 using BH.oM.Base.Attributes;
 using System;
@@ -45,7 +46,7 @@ namespace BH.Engine.Adapters.File
         [Input("settings", "Settings to use when writing the CSV file. If null, default settings will be used.")]
         [Input("replace", "If the file exists, you need to set this to true in order to allow overwriting it.")]
         [Input("active", "Boolean used to trigger the function.")]
-        public static bool WriteToCsvFile(object data, string filePath, CsvSettings settings = null, bool replace = false, bool active = false)
+        public static bool WriteToCsvFile(object data, string filePath, CsvConfig settings = null, bool replace = false, bool active = false)
         {
             if (!active || data == null)
                 return false;
@@ -86,207 +87,280 @@ namespace BH.Engine.Adapters.File
         }
 
         /***************************************************/
-        /**** Private Methods                           ****/
-        /***************************************************/
 
-        // Convert a list of objects to a CSV text string, taking care of the following types: List<List<object>>, List<object>, object[,], object[][], object[]
-        public static string FromObject(this object obj, CsvSettings settings = null)
+        public static string FromObject(this object obj, CsvConfig settings = null)
         {
             if (settings == null)
-                settings = new CsvSettings();
-                        
-            // 1) Normalize to list of rows (each row = string[])
-            var rows = new List<string[]>();
+                settings = new CsvConfig();
 
-            switch (obj)
+            object[,] flatten;
+
+            // Shape normalisation (priority to arrays)
+            if (obj is object[,] rect)
             {
-                // --- PRIMARY: Rectangular arrays of objects ---
-                case object[,] rect:
-                    {
-                        int r = rect.GetLength(0);
-                        int c = rect.GetLength(1);
-                        for (int i = 0; i < r; i++)
-                        {
-                            var row = new string[c];
-                            for (int j = 0; j < c; j++)
-                                row[j] = ToCellString(rect[i, j], settings);
-                            rows.Add(row);
-                        }
-                        break;
-                    }
-
-                // --- PRIMARY: Jagged arrays of objects ---
-                case object[][] jagged:
-                    {
-                        foreach (var inner in jagged ?? new object[0][])
-                        {
-                            var src = inner ?? new object[0];
-                            var row = new string[src.Length];
-                            for (int j = 0; j < src.Length; j++)
-                                row[j] = ToCellString(src[j], settings);
-                            rows.Add(row);
-                        }
-                        break;
-                    }
-
-                // --- SECONDARY: Sequences of sequences of objects ---
-                case IEnumerable<IEnumerable<object>> seqOfSeq:
-                    {
-                        foreach (var inner in seqOfSeq)
-                        {
-                            var items = inner ?? new object[0];
-                            var rowList = new List<string>();
-                            foreach (var it in items)
-                                rowList.Add(ToCellString(it, settings));
-                            rows.Add(rowList.ToArray());
-                        }
-                        break;
-                    }
-
-                // --- SECONDARY: Sequence of objects (single row); exclude string itself ---
-                case IEnumerable<object> seq when !(obj is string):
-                    {
-                        var rowList = new List<string>();
-                        foreach (var it in seq)
-                            rowList.Add(ToCellString(it, settings));
-                        rows.Add(rowList.ToArray());
-                        break;
-                    }
-
-                // Single string -> one cell
-                case string s:
-                    {
-                        rows.Add(new[] { s });
-                        break;
-                    }
-
-                // Fallback: single cell from ToString()
-                default:
-                    {
-                        rows.Add(new[] { ToCellString(obj, settings) });
-                        break;
-                    }
+                flatten = rect;
             }
-
-            if (rows.Count == 0)
+            else if (obj is object[][] jagged)
+            {
+                flatten = ToRect(jagged);
+            }
+            else if (obj is IEnumerable<IEnumerable<object>> nested)
+            {
+                flatten = ToRect(nested);
+            }
+            else if (obj is IEnumerable<object> list && !(obj is string))
+            {
+                flatten = ToRect(list);
+            }
+            else if (obj != null && obj.GetType().IsPrimitive)
+            {
+                // Single primitive -> 1x1 table
+                flatten = new object[,] { { obj } };
+            }
+            else
+            {
+                BH.Engine.Base.Compute.RecordError(
+                    $"The input data of type `{obj?.GetType().Name ?? "null"}` is not supported. " +
+                    "Supported types are: object[,], object[][], IEnumerable<IEnumerable<object>>, IEnumerable<object>.");
                 return string.Empty;
-
-            // 2) Pad ragged rows to the maximum width
-            int maxCols = 0;
-            for (int i = 0; i < rows.Count; i++)
-            {
-                var r = rows[i] ?? new string[0];
-                if (r.Length > maxCols) maxCols = r.Length;
-            }
-            if (maxCols == 0) maxCols = 1;
-
-            for (int i = 0; i < rows.Count; i++)
-            {
-                var r = rows[i] ?? new string[0];
-                if (r.Length < maxCols)
-                {
-                    var padded = new string[maxCols];
-                    Array.Copy(r, padded, r.Length); // remaining are null -> treated as empty
-                    rows[i] = padded;
-                }
             }
 
-            // 3) Serialize with CSV escaping
+            // Convert cells to string with formatting rules
+            string[,] table = ToStringTable(flatten, settings);
+
+            // Serialize to CSV
             var delim = settings.Delimiter ?? "\t";
-            var sb = new StringBuilder(rows.Count * maxCols * 4);
-            for (int i = 0; i < rows.Count; i++)
+            int r = table.GetLength(0);
+            int c = table.GetLength(1);
+            var sb = new StringBuilder(r * Math.Max(1, c) * 4);
+
+            for (int i = 0; i < r; i++)
             {
-                var encoded = rows[i].Select(cell => EscapeCsv(cell ?? string.Empty, delim));
+                var encoded = Enumerable.Range(0, c).Select(j => EscapeCsv(table[i, j] ?? string.Empty, delim));
                 sb.Append(string.Join(delim, encoded));
-                if (i < rows.Count - 1)
-                    sb.Append('\n');
+                if (i < r - 1) sb.Append('\n');
             }
 
             return sb.ToString();
         }
-
         /*******************************************/
         /**** Private Methods                  *****/
         /*******************************************/
 
-        private static string ToCellString(object value, CsvSettings settings)
+        private static object[,] ToRect(object[][] obj)
         {
-            if (value == null)
-                return string.Empty;
-
-            // string
-            var s = value as string;
-            if (s != null)
-                return s;
-
-            // numeric (round if Digit set)
-            if (IsNumeric(value))
+            if (obj == null || obj.Length == 0)
+                return new object[0, 0];
+            int r = obj.Length;
+            int c = obj.Max(a => a?.Length ?? 0);
+            var result = new object[r, c];
+            for (int i = 0; i < r; i++)
             {
-                double d = System.Convert.ToDouble(value, CultureInfo.InvariantCulture);
-
-                string raw;
-                if (settings.Digit.HasValue)
+                var row = obj[i] ?? new object[0];
+                for (int j = 0; j < c; j++)
                 {
-                    int digits = (int) settings.Digit.Value;
-                    var format = digits > 0 ? "0." + new string('#', digits) : "0";
-                    raw = Math.Round(d, digits).ToString(format, CultureInfo.InvariantCulture);
+                    result[i, j] = j < row.Length ? row[j] : null;
                 }
-                else
-                {
-                    raw = d.ToString("G", CultureInfo.InvariantCulture);
-                }
+            }
+            return result;
+        }
 
-                // Apply custom decimal separator if needed
-                if (settings.DecimalSeparator != "." && raw.Contains("."))
+        private static object[,] ToRect(IEnumerable<IEnumerable<object>> obj)
+        {
+            if (obj == null)
+                return new object[0, 0];
+            var list = obj.ToList();
+            if (list.Count == 0)
+                return new object[0, 0];
+            int r = list.Count;
+            int c = list.Max(a => a?.Count() ?? 0);
+            var result = new object[r, c];
+            for (int i = 0; i < r; i++)
+            {
+                var row = list[i]?.ToList() ?? new List<object>();
+                for (int j = 0; j < c; j++)
                 {
-                    raw = raw.Replace(".", settings.DecimalSeparator);
+                    result[i, j] = j < row.Count ? row[j] : null;
                 }
+            }
+            return result;
+        }
 
-                return raw;
+        private static object[,] ToRect(IEnumerable<object> obj)
+        {
+            if (obj == null)
+                return new object[0, 0];
+            var list = obj.ToList();
+            if (list.Count == 0)
+                return new object[0, 0];
+            int r = list.Count;
+            int c = 1;
+            var result = new object[r, c];
+            for (int j = 0; j < c; j++)
+            {
+                result[j, 0] = list[j];
+            }
+            return result;
+        }
+
+        private static string[,] ToStringTable(object[,] obj, CsvConfig settings)
+        {
+            if (obj == null)
+                return new string[0, 0];
+
+            int r = obj.GetLength(0);
+            int c = obj.GetLength(1);
+            var result = new string[r, c];
+
+            for (int i = 0; i < r; i++)
+            {
+                bool isHeader = (i == 0);
+                for (int j = 0; j < c; j++)
+                    result[i, j] = FormatCell(obj[i, j], settings, j, isHeader);
             }
 
+            return result;
+        }
+
+        private static string FormatCell(object value, CsvConfig settings, int? column, bool isHeader = false)
+        {
+            if (settings.ColumnDataFormats != null && column.HasValue && ((settings.IncludeHeader && !isHeader) || !settings.IncludeHeader))
+            {
+                var format = settings.ColumnDataFormats[column.Value];
+
+                switch(format)
+                {
+                    case StringType.Boolean:
+                        if(value is bool boolean)
+                            return boolean.FormatBool(settings.BooleanAsNumber);
+                        else
+                            return string.Empty;
+
+                    case StringType.Date:
+                        if (value is DateTime date)
+                            return date.FormatDate(settings.DateTimeFormat);
+                        else
+                            return string.Empty;
+
+                    case StringType.Numeric:
+                        // Accept only IFormattable numerics here; else fall through to generic branch below
+                        var fnum = value as IFormattable;
+                        return fnum != null
+                             ? fnum.FormatNumeric((int?)settings.Digit, settings.DecimalSeparator)
+                             : string.Empty;
+
+                    case StringType.Text:
+                        // Re-run without ColumnDataFormats influence
+                        var noColumnFormats = settings;
+                        noColumnFormats.ColumnDataFormats = null;
+                        return FormatCell(value, noColumnFormats, null, isHeader);
+                }
+            }
+
+            // numeric (round if Digit set)
+            if (value.GetType().IsNumeric(false))
+            {
+                double d = System.Convert.ToDouble(value, CultureInfo.InvariantCulture);
+                return d.FormatNumeric((int?)settings.Digit, settings.DecimalSeparator);
+            }
             // Date/Time
             if (value is DateTime dt)
                 return dt.FormatDate(settings.DateTimeFormat);
 
-
             // Bool
             if (value is bool b)
-                return b ? "true" : "false";
-
-            // Enum
-            var type = value.GetType();
-            if (type.IsEnum)
-                return System.Convert.ToString(value, CultureInfo.InvariantCulture);
+                return b.FormatBool(settings.BooleanAsNumber);
 
             // IFormattable (decimal, Guid, etc.)
             var formattable = value as IFormattable;
-
             if (formattable != null)
-                return formattable.ToString(null, CultureInfo.InvariantCulture);
+                return formattable.FormatIFormattable();
 
+            // Enum
+            if (value.GetType().IsEnum)
+                return (value as Enum).FormatEnum();
+
+            // Other unformattable types
             if (settings.IncludeObjects)
-            {
-                // Fallback: use ToString() if overridden
-                var toString = value.ToString();
-                if (toString != null && toString != type.FullName)
-                    return toString;
-                // Fallback: type name
-                return $"<{type.Name}>";
-            }
+                return value.FormatObject();
 
             // Fallback
             return string.Empty;
         }
 
-        private static bool IsNumeric(object value)
+        private static string FormatDate(this DateTime date, DateFormatOptions option)
         {
-            return value is byte || value is sbyte ||
-                   value is short || value is ushort ||
-                   value is int || value is uint ||
-                   value is long || value is ulong ||
-                   value is float || value is double ||
-                   value is decimal;
+            if (date == null)
+                return string.Empty;
+
+            switch (option)
+            {
+                case DateFormatOptions.ISO8601:
+                    // round-trip, always UTC if DateTime.Kind is UTC
+                    return date.ToString("o", CultureInfo.InvariantCulture);
+
+                case DateFormatOptions.US:
+                    // month/day/year
+                    return date.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture);
+
+                case DateFormatOptions.EU:
+                default:
+                    // day/month/year
+                    return date.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
+            }
+        }
+
+        private static string FormatNumeric(this IFormattable number, int? digits, string decimalSeparator)
+        {
+            if (number == null)
+                return string.Empty;
+            string raw;
+            if (digits.HasValue)
+            {
+                int d = Math.Max(0, digits.Value);
+                var format = d > 0 ? "0." + new string('#', d) : "0";
+                raw = number.ToString(format, CultureInfo.InvariantCulture);
+            }
+            else
+            {
+                raw = number.ToString("G", CultureInfo.InvariantCulture);
+            }
+            // Apply custom decimal separator if needed
+            if (decimalSeparator != "." && raw.Contains("."))
+            {
+                raw = raw.Replace(".", decimalSeparator);
+            }
+            return raw;
+        }
+
+        private static string FormatBool(this bool b, bool asNumber)
+        {
+            return asNumber ? (b ? "1" : "0") : (b ? "true" : "false");
+        }
+
+        private static string FormatEnum(this Enum e)
+        {
+            return System.Convert.ToString(e, CultureInfo.InvariantCulture);
+        }
+
+        private static string FormatIFormattable(this IFormattable f)
+        {
+            return f.ToString(null, CultureInfo.InvariantCulture);
+        }
+
+        private static string FormatObject(this object obj, string propName = null)
+        {
+            if (obj == null)
+                return string.Empty;
+
+            if (propName != null)
+                return obj.GetType().GetProperty(propName)?.GetValue(obj).ToString();
+
+            var toString = obj.ToString();
+            if (toString != null && toString != obj.GetType().FullName)
+                return toString;
+
+            return $"<{obj.GetType().Name}>";
         }
 
         private static string EscapeCsv(string input, string delimiter)
@@ -306,23 +380,5 @@ namespace BH.Engine.Adapters.File
             return "\"" + doubled + "\"";
         }
 
-        private static string FormatDate(this IFormattable date, DateFormatOptions option)
-        {
-            switch (option)
-            {
-                case DateFormatOptions.ISO8601:
-                    // round-trip, always UTC if DateTime.Kind is UTC
-                    return date.ToString("o", CultureInfo.InvariantCulture);
-
-                case DateFormatOptions.US:
-                    // month/day/year
-                    return date.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture);
-
-                case DateFormatOptions.EU:
-                default:
-                    // day/month/year
-                    return date.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
-            }
-        }
     }
 }
