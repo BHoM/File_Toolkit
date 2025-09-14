@@ -63,7 +63,6 @@ namespace BH.Engine.Adapters.File
             string[] lines;
             try
             {
-                // Note: ReadAllLines splits on Environment.NewLine (handles \r\n and \n)
                 lines = System.IO.File.ReadAllLines(filePath);
             }
             catch (Exception e)
@@ -80,7 +79,6 @@ namespace BH.Engine.Adapters.File
             for (int i = 0; i < lines.Length; i++)
             {
                 var line = lines[i];
-                // Skip completely empty lines
                 if (string.IsNullOrEmpty(line))
                     continue;
 
@@ -123,11 +121,10 @@ namespace BH.Engine.Adapters.File
         /**** Private Helpers                           ****/
         /***************************************************/
 
-        // CSV splitter: handles quotes, escaped quotes (""), and multi-char delimiters (e.g., "\t")
         private static string[] SplitCsvLine(string line, string delimiter)
         {
             if (string.IsNullOrEmpty(line))
-                return new string[0];
+                return Array.Empty<string>();
 
             var cells = new List<string>();
             var current = new System.Text.StringBuilder();
@@ -144,8 +141,7 @@ namespace BH.Engine.Adapters.File
                 {
                     if (inQuotes && i + 1 < n && line[i + 1] == '"')
                     {
-                        // Escaped quote -> add one quote
-                        current.Append('"');
+                        current.Append('"'); // Escaped quote
                         i += 2;
                         continue;
                     }
@@ -157,7 +153,6 @@ namespace BH.Engine.Adapters.File
                 if (!inQuotes && dlen > 0 && i + dlen <= n &&
                     string.CompareOrdinal(line, i, delimiter, 0, dlen) == 0)
                 {
-                    // End of cell
                     cells.Add(current.ToString());
                     current.Length = 0;
                     i += dlen;
@@ -172,9 +167,8 @@ namespace BH.Engine.Adapters.File
             return cells.ToArray();
         }
 
-        // Column-aware parsing with fallbacks:
-        // - If ColumnDataFormats[j] exists, parse by that contract
-        // - Else, try bool/(1/0), numeric (with DecimalSeparator), date (several formats), else string
+        /***************************************************/
+
         private static object ParseCell(string raw, int columnIndex, CsvConfig settings)
         {
             if (string.IsNullOrEmpty(raw))
@@ -190,29 +184,27 @@ namespace BH.Engine.Adapters.File
                 switch (settings.ColumnDataFormats[columnIndex])
                 {
                     case StringType.Boolean:
-                        return ParseBool(raw, settings);
+                        {
+                            var b = ParseBool(raw, settings);
+                            return b.HasValue ? (object)b.Value : null;
+                        }
 
                     case StringType.Numeric:
                         {
-                            double num;
-                            if (TryParseNumber(raw, settings.DecimalSeparator, out num))
-                                return num;
-                            return null;
+                            var num = ParseNumeric(raw, settings.DecimalSeparator);
+                            return num.HasValue ? (object)num.Value : null;
                         }
 
                     case StringType.Date:
                         {
-                            DateTime dt;
-                            if (TryParseDate(raw, settings.DateTimeFormat, out dt))
-                                return dt;
-                            // If date parsing fails but it's a double OA, try that as a last resort
-                            double serial;
-                            if (double.TryParse(raw.Replace(settings.DecimalSeparator, "."), NumberStyles.Any, CultureInfo.InvariantCulture, out serial))
+                            var dt = ParseDate(raw, settings.DateTimeFormat);
+                            if (dt.HasValue) return dt.Value;
+
+                            // OA serial fallback (Excel serial date)
+                            var serial = ParseNumeric(raw, settings.DecimalSeparator);
+                            if (serial.HasValue)
                             {
-                                try
-                                {
-                                    return DateTime.FromOADate(serial);
-                                }
+                                try { return DateTime.FromOADate(serial.Value); }
                                 catch { /* ignore */ }
                             }
                             return null;
@@ -223,36 +215,31 @@ namespace BH.Engine.Adapters.File
                 }
             }
 
-            // ---- Heuristic fallback (no explicit column format) ----
-
-            // Bool
+            // Try Bool
             var bParsed = ParseBool(raw, settings);
-            if (bParsed != null)
-                return bParsed.Value;
+            if (bParsed.HasValue) return bParsed.Value;
 
-            // Number
-            double d;
-            if (TryParseNumber(raw, settings.DecimalSeparator, out d))
-                return d;
+            // Try Number
+            var d = ParseNumeric(raw, settings.DecimalSeparator);
+            if (d.HasValue) return d.Value;
 
-            // Date (ISO/US/EU tries + OA double fallback)
-            DateTime when;
-            if (TryParseDate(raw, settings.DateTimeFormat, out when))
-                return when;
+            // Try Date
+            var when = ParseDate(raw, settings.DateTimeFormat);
+            if (when.HasValue) return when.Value;
 
-            double serial2;
-            if (double.TryParse(raw.Replace(settings.DecimalSeparator, "."), NumberStyles.Any, CultureInfo.InvariantCulture, out serial2))
+            // OA serial fallback
+            var serial2 = ParseNumeric(raw, settings.DecimalSeparator);
+            if (serial2.HasValue)
             {
-                try
-                {
-                    return DateTime.FromOADate(serial2);
-                }
+                try { return DateTime.FromOADate(serial2.Value); }
                 catch { /* ignore */ }
             }
 
             // Text as-is
             return raw;
         }
+
+        /***************************************************/
 
         private static bool? ParseBool(string raw, CsvConfig settings)
         {
@@ -267,28 +254,32 @@ namespace BH.Engine.Adapters.File
             return null;
         }
 
-        private static bool TryParseNumber(string raw, string decimalSeparator, out double value)
-        {
-            value = 0d;
-            if (string.IsNullOrEmpty(raw))
-                return false;
+        /***************************************************/
 
-            // Normalise custom decimal separator to "."
+        private static double? ParseNumeric(string raw, string decimalSeparator)
+        {
+            if (string.IsNullOrEmpty(raw))
+                return null;
+
             var norm = string.IsNullOrEmpty(decimalSeparator) || decimalSeparator == "."
                        ? raw
                        : raw.Replace(decimalSeparator, ".");
 
-            return double.TryParse(norm, NumberStyles.Any, CultureInfo.InvariantCulture, out value);
+            if (double.TryParse(norm, NumberStyles.Any, CultureInfo.InvariantCulture, out var value))
+                return value;
+
+            return null;
         }
 
-        // Date parsing guided by DateFormatOptions (date-only by default), with tolerant fallbacks.
-        private static bool TryParseDate(string raw, DateFormatOptions option, out DateTime dt)
+        /***************************************************/
+
+        private static DateTime? ParseDate(string raw, DateFormatOptions option)
         {
-            dt = default(DateTime);
             if (string.IsNullOrEmpty(raw))
-                return false;
+                return null;
 
             string[] patterns;
+
             switch (option)
             {
                 case DateFormatOptions.ISO8601:
@@ -326,16 +317,16 @@ namespace BH.Engine.Adapters.File
                 DateTime tmp;
                 if (DateTime.TryParseExact(raw, patterns[i], CultureInfo.InvariantCulture,
                                            DateTimeStyles.None, out tmp))
-                {
-                    dt = tmp;
-                    return true;
-                }
+                    return tmp;
             }
 
-            if (DateTime.TryParse(raw, CultureInfo.InvariantCulture, DateTimeStyles.None, out dt))
-                return true;
+            DateTime any;
+            if (DateTime.TryParse(raw, CultureInfo.InvariantCulture, DateTimeStyles.None, out any))
+                return any;
 
-            return false;
+            return null;
         }
+
+        /***************************************************/
     }
 }
