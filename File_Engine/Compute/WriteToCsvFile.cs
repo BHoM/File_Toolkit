@@ -68,7 +68,7 @@ namespace BH.Engine.Adapters.File
                 return false;
             }
 
-            // Serialise to json and create the file and directory.
+            // Serialise to csv and create the file and directory.
             string table = FromObject(data,settings);
             System.IO.FileInfo fileInfo = new System.IO.FileInfo(filePath);
             fileInfo.Directory.Create(); // If the directory already exists, this method does nothing.
@@ -95,8 +95,12 @@ namespace BH.Engine.Adapters.File
 
             object[,] flatten;
 
+            if (obj is string || obj.GetType().IsPrimitive || obj is Enum || obj is IFormattable)
+            {
+                return FormatCell(obj, settings, null);
+            }
             // Shape normalisation (priority to arrays)
-            if (obj is object[,] rect)
+            else if (obj is object[,] rect)
             {
                 flatten = rect;
             }
@@ -112,20 +116,14 @@ namespace BH.Engine.Adapters.File
             {
                 flatten = ToRect(list);
             }
-            else if (obj != null && obj.GetType().IsPrimitive)
-            {
-                // Single primitive -> 1x1 table
-                flatten = new object[,] { { obj } };
-            }
             else
             {
                 BH.Engine.Base.Compute.RecordError(
-                    $"The input data of type `{obj?.GetType().Name ?? "null"}` is not supported. " +
-                    "Supported types are: object[,], object[][], IEnumerable<IEnumerable<object>>, IEnumerable<object>.");
+                    $"The input data of type `{obj?.GetType().Name ?? "null"}` is not supported. ");
                 return string.Empty;
             }
 
-            // Convert cells to string with formatting rules
+            // Convert cells to string array with formatting rules
             string[,] table = ToStringTable(flatten, settings);
 
             // Serialize to CSV
@@ -165,6 +163,8 @@ namespace BH.Engine.Adapters.File
             return result;
         }
 
+        /***************************************************/
+
         private static object[,] ToRect(IEnumerable<IEnumerable<object>> obj)
         {
             if (obj == null)
@@ -186,22 +186,28 @@ namespace BH.Engine.Adapters.File
             return result;
         }
 
+        /***************************************************/
+
         private static object[,] ToRect(IEnumerable<object> obj)
         {
             if (obj == null)
                 return new object[0, 0];
+
             var list = obj.ToList();
             if (list.Count == 0)
                 return new object[0, 0];
+
             int r = list.Count;
-            int c = 1;
+            int c = 0;
             var result = new object[r, c];
-            for (int j = 0; j < c; j++)
+            for (int i = 0; i < r; i++)
             {
-                result[j, 0] = list[j];
+                result[i, 0] = list[i];
             }
             return result;
         }
+
+        /***************************************************/
 
         private static string[,] ToStringTable(object[,] obj, CsvConfig settings)
         {
@@ -222,38 +228,51 @@ namespace BH.Engine.Adapters.File
             return result;
         }
 
+        /***************************************************/
+
         private static string FormatCell(object value, CsvConfig settings, int? column, bool isHeader = false)
         {
             if (settings.ColumnDataFormats != null && column.HasValue && ((settings.IncludeHeader && !isHeader) || !settings.IncludeHeader))
             {
-                var format = settings.ColumnDataFormats[column.Value];
+                StringType? format = settings.ColumnDataFormats[column.Value];
 
-                switch(format)
+                if (format.HasValue)
                 {
-                    case StringType.Boolean:
-                        if(value is bool boolean)
-                            return boolean.FormatBool(settings.BooleanAsNumber);
-                        else
-                            return string.Empty;
+                    switch (format)
+                    {
+                        case StringType.Boolean:
+                            if(value is bool boolean)
+                                return boolean.FormatBool(settings.BooleanAsNumber);
+                            else
+                                return string.Empty;
 
-                    case StringType.Date:
-                        if (value is IFormattable date)
-                            return date.FormatDate(settings.DateTimeFormat);
-                        else
-                            return string.Empty;
+                        case StringType.Date:
+                            if (value is IFormattable date)
+                                return date.FormatDate(settings.DateTimeFormat);
+                            else
+                                return string.Empty;
 
-                    case StringType.Numeric:
-                        // Accept only IFormattable numerics here; else fall through to generic branch below
-                        var fnum = value as IFormattable;
-                        return fnum != null
-                             ? fnum.FormatNumeric((int?)settings.Digit, settings.DecimalSeparator)
-                             : string.Empty;
+                        case StringType.Numeric:
+                            // Accept only IFormattable numerics here; else fall through to generic branch below
+                            var fnum = value as IFormattable;
+                            return fnum != null
+                                 ? fnum.FormatNumeric((int?)settings.Digit, settings.DecimalSeparator)
+                                 : string.Empty;
 
-                    case StringType.Text:
-                        // Re-run without ColumnDataFormats influence
-                        var noColumnFormats = settings;
-                        noColumnFormats.ColumnDataFormats = null;
-                        return FormatCell(value, noColumnFormats, null, isHeader);
+                        case StringType.Text:
+                            // Re-run without ColumnDataFormats influence
+                            var noColumnFormats = new CsvConfig
+                            {
+                                IncludeHeader = settings.IncludeHeader,
+                                Digit = settings.Digit,
+                                DecimalSeparator = settings.DecimalSeparator,
+                                DateTimeFormat = settings.DateTimeFormat,
+                                Delimiter = settings.Delimiter,
+                                IncludeObjects = settings.IncludeObjects,
+                                ColumnDataFormats = null
+                            };
+                            return FormatCell(value, noColumnFormats, null, isHeader);
+                    }
                 }
             }
 
@@ -287,6 +306,8 @@ namespace BH.Engine.Adapters.File
 
             return string.Empty;
         }
+
+        /***************************************************/
 
         private static string FormatDate(this IFormattable date, DateFormatOptions option)
         {
@@ -329,6 +350,8 @@ namespace BH.Engine.Adapters.File
             return date.ToString(null, CultureInfo.InvariantCulture);
         }
 
+        /***************************************************/
+
         private static string FormatNumeric(this IFormattable number, int? digits, string decimalSeparator)
         {
             if (number == null)
@@ -352,20 +375,28 @@ namespace BH.Engine.Adapters.File
             return raw;
         }
 
+        /***************************************************/
+
         private static string FormatBool(this bool b, bool asNumber)
         {
             return asNumber ? (b ? "1" : "0") : (b ? "true" : "false");
         }
+
+        /***************************************************/
 
         private static string FormatEnum(this Enum e)
         {
             return System.Convert.ToString(e, CultureInfo.InvariantCulture);
         }
 
+        /***************************************************/
+
         private static string FormatIFormattable(this IFormattable f)
         {
             return f.ToString(null, CultureInfo.InvariantCulture);
         }
+
+        /***************************************************/
 
         private static string FormatObject(this object obj, string propName = null)
         {
@@ -381,6 +412,8 @@ namespace BH.Engine.Adapters.File
 
             return $"<{obj.GetType().Name}>";
         }
+
+        /***************************************************/
 
         private static string EscapeCsv(string input, string delimiter)
         {
@@ -398,6 +431,8 @@ namespace BH.Engine.Adapters.File
             var doubled = input.Replace("\"", "\"\"");
             return "\"" + doubled + "\"";
         }
+
+        /***************************************************/
 
     }
 }
