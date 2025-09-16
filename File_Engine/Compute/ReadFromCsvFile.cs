@@ -39,21 +39,21 @@ namespace BH.Engine.Adapters.File
         [Input("filePath", "Path to the CSV file.")]
         [Input("settings", "CSV settings including delimiter, decimal separator, and per-column formats. If null, defaults are used.")]
         [Input("active", "Boolean used to trigger the function.")]
-        public static object[,] ReadFromCsvFile(string filePath, CsvConfig settings = null, bool active = false)
+        public static IEnumerable<IEnumerable<object>> ReadFromCsvFile(string filePath, CsvConfig settings = null, bool active = false)
         {
             if (!active)
-                return new object[0, 0];
+                return Array.Empty<IEnumerable<object>>();
 
             if (string.IsNullOrWhiteSpace(filePath))
             {
                 BH.Engine.Base.Compute.RecordError("The file path must not be empty.");
-                return new object[0, 0];
+                return Array.Empty<IEnumerable<object>>();
             }
 
             if (!System.IO.File.Exists(filePath))
             {
                 BH.Engine.Base.Compute.RecordError($"The file `{filePath}` does not exist.");
-                return new object[0, 0];
+                return Array.Empty<IEnumerable<object>>();
             }
 
             if (settings == null)
@@ -68,11 +68,11 @@ namespace BH.Engine.Adapters.File
             catch (Exception e)
             {
                 BH.Engine.Base.Compute.RecordError($"Error reading file:\n\t{e}");
-                return new object[0, 0];
+                return Array.Empty<IEnumerable<object>>();
             }
 
             if (lines.Length == 0)
-                return new object[0, 0];
+                return Array.Empty<IEnumerable<object>>();
 
             // 1) Parse lines into raw string rows (CSV rules: quotes + escaped quotes)
             var rawRows = new List<string[]>();
@@ -86,7 +86,7 @@ namespace BH.Engine.Adapters.File
             }
 
             if (rawRows.Count == 0)
-                return new object[0, 0];
+                return Array.Empty<IEnumerable<object>>();
 
             // 2) Normalize columns (pad ragged rows to max width)
             int rAll = rawRows.Count;
@@ -95,26 +95,28 @@ namespace BH.Engine.Adapters.File
                 if (rawRows[i].Length > c) c = rawRows[i].Length;
 
             if (c == 0)
-                return new object[0, 0];
+                return Array.Empty<IEnumerable<object>>();
 
             // 3) Decide data start index based on IncludeHeader
-            int startRow = (settings.IncludeHeader && rAll > 0) ? 1 : 0;
-            int rData = Math.Max(0, rAll - startRow);
+               var result = new List<List<object>>(rAll);
 
-            var table = new object[rData, c];
-
-            // 4) Parse cells with column-aware formats
-            for (int i = 0; i < rData; i++)
+            for (int i = 0; i < rAll; i++)
             {
-                var src = rawRows[i + startRow];
+                bool isHeader = settings.IncludeHeader && i == 0;
+
+                var src = rawRows[i];
+                var row = new List<object>(c);
+
                 for (int j = 0; j < c; j++)
                 {
                     string cell = j < src.Length ? src[j] : null;
-                    table[i, j] = ParseCell(cell, j, settings);
+                    row.Add(ParseCell(cell, j, settings, isHeader));
                 }
+
+                result.Add(row);
             }
 
-            return table;
+            return result;
         }
 
         /***************************************************/
@@ -169,10 +171,13 @@ namespace BH.Engine.Adapters.File
 
         /***************************************************/
 
-        private static object ParseCell(string raw, int columnIndex, CsvConfig settings)
+        private static object ParseCell(string raw, int columnIndex, CsvConfig settings, bool isHeader = false)
         {
             if (string.IsNullOrEmpty(raw))
                 return null;
+
+            if (isHeader)
+                return raw;
 
             bool hasColumnFormat =
                 settings.ColumnDataFormats != null &&
