@@ -232,7 +232,10 @@ namespace BH.Engine.Adapters.File
 
         private static string FormatCell(object value, CsvConfig settings, int? column, bool isHeader = false)
         {
-            if (settings.ColumnDataFormats != null && column.HasValue && ((settings.IncludeHeader && !isHeader) || !settings.IncludeHeader))
+            if (settings.ColumnDataFormats != null 
+                && column.HasValue 
+                && column.Value < settings.ColumnDataFormats.Count
+                && ((settings.IncludeHeader && !isHeader) || !settings.IncludeHeader))
             {
                 StringType? format = settings.ColumnDataFormats[column.Value];
 
@@ -303,6 +306,9 @@ namespace BH.Engine.Adapters.File
             if (settings.IncludeObjects)
                 return value.FormatObject();
 
+            //String
+            if (value is string s)
+                return s;
 
             return string.Empty;
         }
@@ -328,22 +334,18 @@ namespace BH.Engine.Adapters.File
                 }
             }
 
-            // Handle DateTime
-            if (date is DateTime dt2)
-                return dt2.FormatDate(option);
-
             // Handle DateTimeOffset
-            if (date is DateTimeOffset dto)
+            if (date is DateTime dt2)
             {
                 switch (option)
                 {
                     case DateFormatOptions.ISO8601:
-                        return dto.ToString("o", CultureInfo.InvariantCulture);
+                        return dt2.ToString("o", CultureInfo.InvariantCulture);
                     case DateFormatOptions.US:
-                        return dto.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture);
+                        return dt2.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture);
                     case DateFormatOptions.EU:
                     default:
-                        return dto.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
+                        return dt2.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
                 }
             }
 
