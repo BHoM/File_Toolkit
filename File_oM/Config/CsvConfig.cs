@@ -56,6 +56,9 @@ namespace BH.oM.Adapters.File
 
         [Description(" The format to use for date values. Options include ISO8601 (e.g., 2023-10-05T14:48:00Z), US (e.g., 10/05/2023), and EU (e.g., 05/10/2023). Default is ISO8601.")]
         public DateFormatOptions DateTimeFormat { get; set; } = DateFormatOptions.EU;
+
+        [Description(" The text encoding to use when reading or writing the CSV file. Default is UTF-8.")]
+        public Encodings Encoding { get; set; } = Encodings.UTF8;
     }
 }
 

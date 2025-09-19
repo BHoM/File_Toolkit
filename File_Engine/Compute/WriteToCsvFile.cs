@@ -75,7 +75,7 @@ namespace BH.Engine.Adapters.File
 
             try
             {
-                System.IO.File.WriteAllText(filePath, table, Encoding.Unicode);
+                System.IO.File.WriteAllText(filePath, table, Query.FromEnum(settings.Encoding));
             }
             catch (Exception e)
             {
