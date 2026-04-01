@@ -40,6 +40,8 @@ namespace BH.Engine.Adapters.File
         /***************************************************/
 
         [Description("Replaces wildcards (such as '*') in the input string, in order to form a proper Regex string.")]
+        [Input("str", "The string containing wildcard characters to be converted to their Regex equivalents.")]
+        [Output("result", "The input string with wildcard characters replaced by their corresponding Regex operators.")]
         public static string WildcardsToRegex(this string str)
         {
             // Parse for asterisks

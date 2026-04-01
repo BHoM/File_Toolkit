@@ -40,6 +40,9 @@ namespace BH.Engine.Adapters.File
         /***************************************************/
 
         [Description("Tells if a filename or path contains a Regex. Also parses for valid BHoM-regex operators, like the single asterisk `*`.")]
+        [Input("fullPath", "The full file path or filename to check for Regex or wildcard operators.")]
+        [Input("regex", "The parsed Regex object extracted from the path, if one was found.")]
+        [Output("result", "True if the path contains a valid Regex or wildcard operators, false otherwise.")]
         public static bool TryGetRegexFromPath(string fullPath, out Regex regex)
         {
             string regexStr = fullPath;
