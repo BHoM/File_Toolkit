@@ -34,10 +34,10 @@ namespace BH.oM.Adapters.File
     public class RemoveConfig : ActionConfig
     {
         [Description("Keeps the warnings about Deletion off.")]
-        public bool DisableWarnings { get; set; } = false;
+        public virtual bool DisableWarnings { get; set; } = false;
 
         [Description("Whether to include Hidden files.")]
-        public bool IncludeHiddenFiles { get; set; } = false;
+        public virtual bool IncludeHiddenFiles { get; set; } = false;
     }
 }
 

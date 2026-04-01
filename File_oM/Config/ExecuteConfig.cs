@@ -34,7 +34,7 @@ namespace BH.oM.Adapters.File
     public class ExecuteConfig : ActionConfig
     {
         [Description("Keeps the warnings about off.")]
-        public bool DisableWarnings { get; set; } = false;
+        public virtual bool DisableWarnings { get; set; } = false;
     }
 }
 

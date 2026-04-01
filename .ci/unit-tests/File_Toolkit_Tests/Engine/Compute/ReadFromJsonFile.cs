@@ -24,21 +24,24 @@ using NUnit.Framework;
 using BH.Adapter.File;
 using BH.oM.Structure.Elements;
 using System.Reflection;
+using System.ComponentModel;
 using FluentAssertions;
 using Newtonsoft.Json;
 
 namespace BH.Tests.Engine.Compute
 {
-    public class Compute
+    public class ReadFromJsonFile
     {
         string randomTestFilePath = "";
 
+        [Description("Sets up a random test file path before each test.")]
         [SetUp]
         public void SetupRandomTestFilePath()
         {
             randomTestFilePath = Path.Combine(Directory.GetCurrentDirectory(), Guid.NewGuid().ToString() + ".json");
         }
 
+        [Description("Deletes the test file after each test.")]
         [TearDown]
         public void DeleteRandomTestFile()
         {
@@ -46,6 +49,7 @@ namespace BH.Tests.Engine.Compute
                 File.Delete(randomTestFilePath);
         }
 
+        [Description("Tests reading a Bar object back from a JSON file pushed by the FileAdapter.")]
         [Test]
         public void Bar()
         {
@@ -63,6 +67,7 @@ namespace BH.Tests.Engine.Compute
             fileContent.Should().BeEquivalentTo(objectsToPush);
         }
 
+        [Description("Tests reading a Bar object back from a formatted JSON file pushed by the FileAdapter.")]
         [Test]
         public void Bar_FormattedJson()
         {
