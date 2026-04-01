@@ -105,29 +105,6 @@ namespace BH.Engine.Adapters.File
 
         /***************************************************/
 
-        [Description("Replaces wildcards (such as '*') in the input string, in order to form a proper Regex string.")]
-        public static string WildcardsToRegex(this string str)
-        {
-            // Parse for asterisks
-            for (int i = 0; i < str.Count(); i++)
-            {
-                if (str[i] != '*')
-                    continue;
-
-                // We must check if the asterisk is preceded by another regex operator.
-                char charBeforeAsterisk = str.ElementAtOrDefault(i - 1);
-
-                // If not, then the user intended to use it as a wildcard alone.
-                if (!m_regexOperatorChars.Contains(charBeforeAsterisk))
-                    str = "^" + Regex.Escape(str).Replace("\\*", ".*") + "$"; //Converts the asterisks into a Regex. https://stackoverflow.com/a/30300521/3873799
-            }
-
-            return str;
-        }
-
-
-        /***************************************************/
-
         private static List<char> m_regexOperatorChars = new List<char> { '.', '/', '\\', '[', ']', '$', '*', '^', '+', '?', '{', '}', '(', ')', '/' };
 
 

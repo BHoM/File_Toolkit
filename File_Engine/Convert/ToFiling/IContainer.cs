@@ -34,6 +34,9 @@ namespace BH.Engine.Adapters.File
 {
     public static partial class Convert
     {
+        [Description("Converts an IContainer to an IFSContainer, transferring the location and content.")]
+        [Input("iContainer", "The IContainer to convert to an IFSContainer.")]
+        [Output("fSContainer", "An IFSContainer corresponding to the provided IContainer.")]
         public static oM.Adapters.File.IFSContainer ToFiling(this oM.Adapters.File.IContainer iContainer)
         {
             oM.Adapters.File.IFSContainer fscont = (iContainer as ILocatableResource).ToFiling();

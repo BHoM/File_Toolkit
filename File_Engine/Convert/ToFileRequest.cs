@@ -38,6 +38,9 @@ namespace BH.Engine.Adapters.File
         /*** Methods                                     ***/
         /***************************************************/
 
+        [Description("Converts a FileDirRequest to a FileRequest, preserving file-related filter settings.")]
+        [Input("fdr", "The FileDirRequest to convert to a FileRequest.")]
+        [Output("fileRequest", "A FileRequest derived from the file-related settings of the provided FileDirRequest.")]
         public static oM.Adapters.File.FileRequest ToFileRequest(this FileDirRequest fdr)
         {
             return new FileRequest()

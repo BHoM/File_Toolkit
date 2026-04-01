@@ -28,6 +28,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using BH.oM.Adapters.File;
+using BH.oM.Base.Attributes;
 using System.ComponentModel;
 
 namespace BH.Engine.Adapters.File
@@ -38,6 +39,13 @@ namespace BH.Engine.Adapters.File
         /**** Methods                           ****/
         /*******************************************/
 
+        [Description("Creates a FileDirRequest for querying files and/or directories at the specified location.")]
+        [Input("fullPath", "The full path to the directory to query.")]
+        [Input("includeDirectories", "Whether to include directories in the results.")]
+        [Input("includeFiles", "Whether to include files in the results.")]
+        [Input("searchSubdirectories", "Whether to search recursively in subdirectories.")]
+        [Input("includeFileContents", "Whether to include the contents of the files in the results.")]
+        [Output("fileDirRequest", "A FileDirRequest configured with the provided options.")]
         public static FileDirRequest FileDirRequest(string fullPath, bool includeDirectories = true, bool includeFiles = true, bool searchSubdirectories = true, bool includeFileContents = false)
         {
             return new FileDirRequest()

@@ -34,10 +34,10 @@ namespace BH.oM.Adapters.File
     public class PullConfig : ActionConfig
     {
         [Description("Whether to include Hidden files.")]
-        public bool IncludeHiddenFiles { get; set; } = false;
+        public virtual bool IncludeHiddenFiles { get; set; } = false;
 
         [Description("Whether to include System files.")]
-        public bool IncludeSystemFiles { get; set; } = false;
+        public virtual bool IncludeSystemFiles { get; set; } = false;
     }
 }
 

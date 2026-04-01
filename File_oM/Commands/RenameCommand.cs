@@ -34,13 +34,13 @@ namespace BH.oM.Adapters.File
     public class RenameCommand : IMRCCommand
     {
         [Description("Full paths of the items to be Renamed.")]
-        public string FullPath { get; set; }
+        public virtual string FullPath { get; set; } = "";
 
         [Description("The new Full paths of the Files. Files will be Renamed.")]
-        public string TargetFullPath { get; set; }
+        public virtual string TargetFullPath { get; set; } = "";
 
         [Description("Whether to override the target.")]
-        public bool OverwriteTarget { get; set; } = false;
+        public virtual bool OverwriteTarget { get; set; } = false;
     }
 }
 

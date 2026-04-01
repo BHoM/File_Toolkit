@@ -59,7 +59,7 @@ namespace BH.oM.Adapters.File
         public virtual int MaxNesting { get; set; } = -1;
 
         [Description("Sorting order of the extracted Resources.")]
-        public SortOrder SortOrder { get; set; }
+        public virtual SortOrder SortOrder { get; set; } = SortOrder.Default;
 
         [Description("Sets the maximum number of Files to retrieve." +
             "\nDefaults to -1 which corresponds to no limit.")]

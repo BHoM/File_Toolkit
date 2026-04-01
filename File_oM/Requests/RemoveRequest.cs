@@ -35,7 +35,7 @@ namespace BH.oM.Adapters.File
     public class RemoveRequest : IRequest
     {
         [Description("Full Paths of Directory and/or Files to be Removed.")]
-        public List<string> ToRemove { get; set; } = new List<string>();
+        public virtual List<string> ToRemove { get; set; } = new List<string>();
     }
 }
 
