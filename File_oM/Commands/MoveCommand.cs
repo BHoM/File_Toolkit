@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2025, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -34,18 +34,19 @@ namespace BH.oM.Adapters.File
     public class MoveCommand : IMRCCommand
     {
         [Description("Full paths of the items to be Moved.")]
-        public string FullPath { get; set; }
+        public virtual string FullPath { get; set; } = "";
 
         [Description("The new Full paths of the Files. Files will be Moved there.")]
-        public string TargetFullPath { get; set; }
+        public virtual string TargetFullPath { get; set; } = "";
 
         [Description("Whether to create the target Directory if it doesn't exist.")]
-        public bool CreateDirectoryIfNotExist { get; set; } = true;
+        public virtual bool CreateDirectoryIfNotExist { get; set; } = true;
 
         [Description("Whether to override the target.")]
-        public bool OverwriteTarget { get; set; } = false;
+        public virtual bool OverwriteTarget { get; set; } = false;
     }
 }
+
 
 
 

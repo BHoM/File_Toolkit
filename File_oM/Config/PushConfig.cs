@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2025, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -38,19 +38,20 @@ namespace BH.oM.Adapters.File
             "\nThis serializes the individual objects, and then concatenates the strings separating with a newline." +
             "\nThe obtained format is not valid JSON. You will need to deserialize each individual line." +
             "\nThis is the current standard for Datasets.")]
-        public bool UseDatasetSerialization { get; set; } = false;
+        public virtual bool UseDatasetSerialization { get; set; } = false;
 
         [Description("By default, certain types cannot be pushed to Json as root-level objects, for example numbers.\n" +
             "Set this option to `true` to allow skipping those types.")]
-        public bool SkipUnsupportedTypes { get; set; } = false;
+        public virtual bool SkipUnsupportedTypes { get; set; } = false;
 
         [Description("If true, beautify Json files for web display. Works only if UseDatasetSerialization is set to false.")]
-        public bool BeautifyJson { get; set; } = true;
+        public virtual bool BeautifyJson { get; set; } = true;
 
         [Description("Keeps the warnings about Deletion off.")]
-        public bool DisableWarnings { get; set; } = false;
+        public virtual bool DisableWarnings { get; set; } = false;
     }
 }
+
 
 
 

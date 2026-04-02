@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2025, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -24,21 +24,24 @@ using NUnit.Framework;
 using BH.Adapter.File;
 using BH.oM.Structure.Elements;
 using System.Reflection;
+using System.ComponentModel;
 using FluentAssertions;
 using Newtonsoft.Json;
 
 namespace BH.Tests.Engine.Compute
 {
-    public class Compute
+    public class ReadFromJsonFile
     {
         string randomTestFilePath = "";
 
+        [Description("Sets up a random test file path before each test.")]
         [SetUp]
         public void SetupRandomTestFilePath()
         {
             randomTestFilePath = Path.Combine(Directory.GetCurrentDirectory(), Guid.NewGuid().ToString() + ".json");
         }
 
+        [Description("Deletes the test file after each test.")]
         [TearDown]
         public void DeleteRandomTestFile()
         {
@@ -46,6 +49,7 @@ namespace BH.Tests.Engine.Compute
                 File.Delete(randomTestFilePath);
         }
 
+        [Description("Tests reading a Bar object back from a JSON file pushed by the FileAdapter.")]
         [Test]
         public void Bar()
         {
@@ -63,6 +67,7 @@ namespace BH.Tests.Engine.Compute
             fileContent.Should().BeEquivalentTo(objectsToPush);
         }
 
+        [Description("Tests reading a Bar object back from a formatted JSON file pushed by the FileAdapter.")]
         [Test]
         public void Bar_FormattedJson()
         {
@@ -97,4 +102,5 @@ namespace BH.Tests.Engine.Compute
         }
     }
 }
+
 

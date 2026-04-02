@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2025, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -34,6 +34,9 @@ namespace BH.Engine.Adapters.File
 {
     public static partial class Convert
     {
+        [Description("Converts an IContainer to an IFSContainer, transferring the location and content.")]
+        [Input("iContainer", "The IContainer to convert to an IFSContainer.")]
+        [Output("fSContainer", "An IFSContainer corresponding to the provided IContainer.")]
         public static oM.Adapters.File.IFSContainer ToFiling(this oM.Adapters.File.IContainer iContainer)
         {
             oM.Adapters.File.IFSContainer fscont = (iContainer as ILocatableResource).ToFiling();
@@ -44,6 +47,7 @@ namespace BH.Engine.Adapters.File
         }
     }
 }
+
 
 
 

@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2025, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -38,6 +38,9 @@ namespace BH.Engine.Adapters.File
         /*** Methods                                     ***/
         /***************************************************/
 
+        [Description("Converts a FileDirRequest to a FileRequest, preserving file-related filter settings.")]
+        [Input("fdr", "The FileDirRequest to convert to a FileRequest.")]
+        [Output("fileRequest", "A FileRequest derived from the file-related settings of the provided FileDirRequest.")]
         public static oM.Adapters.File.FileRequest ToFileRequest(this FileDirRequest fdr)
         {
             return new FileRequest()
@@ -53,6 +56,7 @@ namespace BH.Engine.Adapters.File
         /***************************************************/
     }
 }
+
 
 
 

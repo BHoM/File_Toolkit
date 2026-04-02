@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2025, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -40,6 +40,9 @@ namespace BH.Engine.Adapters.File
         /***************************************************/
 
         [Description("Tells if a filename or path contains a Regex. Also parses for valid BHoM-regex operators, like the single asterisk `*`.")]
+        [Input("fullPath", "The full file path or filename to check for Regex or wildcard operators.")]
+        [Input("regex", "The parsed Regex object extracted from the path, if one was found.")]
+        [Output("result", "True if the path contains a valid Regex or wildcard operators, false otherwise.")]
         public static bool TryGetRegexFromPath(string fullPath, out Regex regex)
         {
             string regexStr = fullPath;
@@ -105,35 +108,13 @@ namespace BH.Engine.Adapters.File
 
         /***************************************************/
 
-        [Description("Replaces wildcards (such as '*') in the input string, in order to form a proper Regex string.")]
-        public static string WildcardsToRegex(this string str)
-        {
-            // Parse for asterisks
-            for (int i = 0; i < str.Count(); i++)
-            {
-                if (str[i] != '*')
-                    continue;
-
-                // We must check if the asterisk is preceded by another regex operator.
-                char charBeforeAsterisk = str.ElementAtOrDefault(i - 1);
-
-                // If not, then the user intended to use it as a wildcard alone.
-                if (!m_regexOperatorChars.Contains(charBeforeAsterisk))
-                    str = "^" + Regex.Escape(str).Replace("\\*", ".*") + "$"; //Converts the asterisks into a Regex. https://stackoverflow.com/a/30300521/3873799
-            }
-
-            return str;
-        }
-
-
-        /***************************************************/
-
         private static List<char> m_regexOperatorChars = new List<char> { '.', '/', '\\', '[', ']', '$', '*', '^', '+', '?', '{', '}', '(', ')', '/' };
 
 
         /***************************************************/
     }
 }
+
 
 
 

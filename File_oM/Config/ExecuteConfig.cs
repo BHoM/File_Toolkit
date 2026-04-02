@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2025, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -34,9 +34,10 @@ namespace BH.oM.Adapters.File
     public class ExecuteConfig : ActionConfig
     {
         [Description("Keeps the warnings about off.")]
-        public bool DisableWarnings { get; set; } = false;
+        public virtual bool DisableWarnings { get; set; } = false;
     }
 }
+
 
 
 
